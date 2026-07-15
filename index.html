@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A collection of interactive digital fidget toys — built with HTML5, CSS and Vanilla JS." />
+  <title>Fidget Toys</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="bg-gradient" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <h1 class="site-title">Fidget Toys</h1>
+    <p class="site-subtitle">Pick a toy. Zone out. Breathe.</p>
+  </header>
+
+  <main>
+    <div class="toys-grid">
+
+      <a href="toys/particle-magnet/"
+         class="toy-card"
+         style="--accent:#ff4466;--accent-dim:rgba(255,68,102,0.15)"
+         aria-label="Particle Magnet — click and hold to attract drifting particles">
+        <span class="toy-icon" aria-hidden="true">⚛</span>
+        <h2 class="toy-name">Particle Magnet</h2>
+        <p class="toy-desc">Click &amp; hold to pull a field of drifting red and blue particles toward your cursor.</p>
+        <span class="toy-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <a href="toys/geometric-gravity/"
+         class="toy-card"
+         style="--accent:#ff9944;--accent-dim:rgba(255,153,68,0.15)"
+         aria-label="Geometric Gravity — tilt your device or drag shapes around">
+        <span class="toy-icon" aria-hidden="true">⬡</span>
+        <h2 class="toy-name">Geometric Gravity</h2>
+        <p class="toy-desc">Drag or throw geometric pieces on desktop. Tilt your phone to make them tumble.</p>
+        <span class="toy-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <a href="toys/thock-switch/"
+         class="toy-card"
+         style="--accent:#44aaff;--accent-dim:rgba(68,170,255,0.15)"
+         aria-label="Thock Switch — press the satisfying mechanical keyboard switch">
+        <span class="toy-icon" aria-hidden="true">⌨</span>
+        <h2 class="toy-name">Thock Switch</h2>
+        <p class="toy-desc">A giant mechanical keyboard switch. Press it for the most satisfying click you'll hear today.</p>
+        <span class="toy-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <a href="toys/flick-targets/"
+         class="toy-card"
+         style="--accent:#ff44aa;--accent-dim:rgba(255,68,170,0.15)"
+         aria-label="Flick Targets — pop glowing orbs with quick taps">
+        <span class="toy-icon" aria-hidden="true">◎</span>
+        <h2 class="toy-name">Flick Targets</h2>
+        <p class="toy-desc">Soft-glowing orbs appear at random. Flick or tap to pop them with a satisfying burst.</p>
+        <span class="toy-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <a href="toys/audio-waveform/"
+         class="toy-card"
+         style="--accent:#44ffaa;--accent-dim:rgba(68,255,170,0.15)"
+         aria-label="Audio Waveform — microphone-reactive oscilloscope">
+        <span class="toy-icon" aria-hidden="true">〜</span>
+        <h2 class="toy-name">Audio Waveform</h2>
+        <p class="toy-desc">A live oscilloscope that reacts to any sound around you — music, voice, anything.</p>
+        <span class="toy-arrow" aria-hidden="true">→</span>
+      </a>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>Built with ♥ using HTML5 · CSS · Vanilla JS</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

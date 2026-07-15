@@ -1,0 +1,183 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #09090f;
+  height: 100%;
+}
+
+/* =============================================
+   SCORE BAR
+   ============================================= */
+.score-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  padding: 0.9rem 1rem;
+  background: rgba(9,9,15,0.7);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.score-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.score-label {
+  font-family: 'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.3);
+}
+
+.score-value {
+  font-family: 'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #ff44aa;
+  line-height: 1;
+  transition: transform 0.1s ease;
+}
+
+.score-value.bump {
+  transform: scale(1.35);
+}
+
+/* =============================================
+   FIELD (orb stage)
+   ============================================= */
+.field {
+  position: fixed;
+  inset: 0;
+  /* leave space for score bar */
+  top: 62px;
+}
+
+/* =============================================
+   ORB
+   ============================================= */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  cursor: pointer;
+  transform: translate(-50%, -50%) scale(0);
+  will-change: transform, opacity;
+  animation: orbAppear 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+
+  /* Core fill — uses --c custom property set per-orb via inline style */
+  background: radial-gradient(circle at 35% 35%,
+    rgba(255,255,255,0.45) 0%,
+    var(--c) 50%,
+    rgba(0,0,0,0.25) 100%
+  );
+  box-shadow:
+    0 0 18px var(--c),
+    0 0 45px var(--c),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* Outer glow pulse ring */
+.orb::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--c) 0%, transparent 65%);
+  opacity: 0.2;
+  pointer-events: none;
+  animation: orbPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes orbAppear {
+  0%   { transform: translate(-50%, -50%) scale(0);   opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+}
+
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1);    opacity: 0.22; }
+  50%       { transform: scale(1.3); opacity: 0.35; }
+}
+
+/* Popping animation */
+.orb.popping {
+  animation: orbPop 0.3s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes orbPop {
+  0%   { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
+  40%  { transform: translate(-50%, -50%) scale(1.65); opacity: 0.55; }
+  100% { transform: translate(-50%, -50%) scale(2.6);  opacity: 0; }
+}
+
+/* Glow ring burst on pop */
+.orb.popping::before {
+  animation: ringBurst 0.45s ease-out forwards;
+}
+
+@keyframes ringBurst {
+  0%   { inset: -20%;  opacity: 0.65; }
+  100% { inset: -130%; opacity: 0; }
+}
+
+/* =============================================
+   SCORE FLOATER
+   ============================================= */
+.floater {
+  position: fixed;
+  pointer-events: none;
+  z-index: 100;
+  font-family: 'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ff44aa;
+  text-shadow: 0 0 12px rgba(255,68,170,0.7);
+  animation: floatUp 0.7s ease-out forwards;
+  white-space: nowrap;
+}
+
+@keyframes floatUp {
+  0%   { transform: translateY(0)    scale(1);   opacity: 1; }
+  100% { transform: translateY(-60px) scale(0.8); opacity: 0; }
+}
+
+/* =============================================
+   HINT
+   ============================================= */
+.hint {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hint-text {
+  display: inline-block;
+  padding: 0.4rem 1.1rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px;
+  color: rgba(255,255,255,0.45);
+  font-size: 0.78rem;
+  font-family: 'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(8px);
+  animation: hintFade 3.5s ease 1.5s forwards;
+  opacity: 1;
+}
+
+@keyframes hintFade {
+  0%   { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}

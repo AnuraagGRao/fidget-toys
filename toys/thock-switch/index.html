@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thock Switch · Fidget Toys</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
+
+  <main class="switch-scene" aria-label="Mechanical keyboard switch — press to hear the thock">
+
+    <!-- Subtle radial glow behind the switch -->
+    <div class="scene-glow" aria-hidden="true"></div>
+
+    <div class="switch-wrapper" id="switchWrapper">
+      <!-- Plate / PCB base -->
+      <div class="pcb" aria-hidden="true">
+        <div class="pcb-trace pcb-trace--1"></div>
+        <div class="pcb-trace pcb-trace--2"></div>
+        <div class="pcb-pin pcb-pin--l"></div>
+        <div class="pcb-pin pcb-pin--r"></div>
+      </div>
+
+      <!-- Switch housing (transparent body) -->
+      <div class="housing" aria-hidden="true">
+        <!-- Spring visible inside -->
+        <div class="spring" id="spring"></div>
+        <!-- LED window glow -->
+        <div class="led-window" id="ledWindow"></div>
+      </div>
+
+      <!-- Keycap — the interactive element -->
+      <button class="keycap"
+              id="keycap"
+              aria-label="Press the switch"
+              aria-pressed="false">
+        <span class="keycap-legend" aria-hidden="true">⌨</span>
+        <span class="keycap-sub"    aria-hidden="true">THOCK</span>
+      </button>
+    </div>
+
+    <!-- Press counter -->
+    <div class="counter" id="counter" aria-live="polite">
+      <span class="counter-value" id="counterValue">0</span>
+      <span class="counter-label">presses</span>
+    </div>
+  </main>
+
+  <div class="hint">
+    <span class="hint-text">Click or tap the key</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

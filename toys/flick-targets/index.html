@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flick Targets · Fidget Toys</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
+
+  <!-- Score bar -->
+  <div class="score-bar" aria-live="polite" aria-atomic="true">
+    <div class="score-section">
+      <span class="score-label">SCORE</span>
+      <span class="score-value" id="score">0</span>
+    </div>
+    <div class="score-section">
+      <span class="score-label">BEST</span>
+      <span class="score-value" id="best">0</span>
+    </div>
+  </div>
+
+  <!-- Orbs container -->
+  <div id="field" class="field" aria-label="Tap the glowing orbs to pop them"></div>
+
+  <!-- Pop score floater template (cloned in JS) -->
+  <template id="floaterTpl">
+    <div class="floater" aria-hidden="true">+1</div>
+  </template>
+
+  <div class="hint">
+    <span class="hint-text">Tap the glowing orbs to pop them</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

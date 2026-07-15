@@ -1,0 +1,81 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #09090f;
+}
+
+#canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  cursor: grab;
+  touch-action: none;
+}
+
+#canvas.grabbing {
+  cursor: grabbing;
+}
+
+/* Enable Tilt button (iOS only) */
+.tilt-btn {
+  position: fixed;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  padding: 0.7rem 1.6rem;
+  background: rgba(255,153,68,0.15);
+  border: 1px solid rgba(255,153,68,0.4);
+  border-radius: 999px;
+  color: #ff9944;
+  font-size: 0.9rem;
+  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background 0.2s ease;
+}
+
+.tilt-btn:hover { background: rgba(255,153,68,0.25); }
+.tilt-btn.hidden { display: none; }
+
+/* Hint */
+.hint {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  gap: 0.8rem;
+}
+
+.hint-text {
+  display: inline-block;
+  padding: 0.4rem 1.1rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px;
+  color: rgba(255,255,255,0.45);
+  font-size: 0.78rem;
+  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(8px);
+  animation: hintFade 4s ease 1.5s forwards;
+  opacity: 1;
+}
+
+/* Show desktop hint only on pointer devices */
+@media (hover: none) {
+  .desktop-hint { display: none; }
+}
+@media (hover: hover) {
+  .mobile-hint { display: none; }
+}
+
+@keyframes hintFade {
+  0%   { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}

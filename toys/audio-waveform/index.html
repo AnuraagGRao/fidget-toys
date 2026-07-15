@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audio Waveform · Fidget Toys</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
+
+  <canvas id="canvas" aria-label="Audio-reactive waveform visualiser"></canvas>
+
+  <!-- Mic toggle button -->
+  <button class="mic-btn" id="micBtn" aria-pressed="false" aria-label="Enable microphone">
+    <span class="mic-icon" id="micIcon">🎙</span>
+    <span class="mic-label" id="micLabel">Enable Mic</span>
+  </button>
+
+  <!-- Permission / error message -->
+  <div class="mic-status" id="micStatus" aria-live="polite"></div>
+
+  <div class="hint">
+    <span class="hint-text">Enable mic to see your voice or music as a live waveform</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
