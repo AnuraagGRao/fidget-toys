@@ -1,0 +1,111 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #09090f;
+}
+
+#canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* =============================================
+   MIC BUTTON
+   ============================================= */
+.mic-btn {
+  position: fixed;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 1.5rem;
+  background: rgba(68,255,170,0.1);
+  border: 1px solid rgba(68,255,170,0.3);
+  border-radius: 999px;
+  color: #44ffaa;
+  font-family: 'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;
+  font-size: 0.88rem;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mic-btn:hover {
+  background: rgba(68,255,170,0.18);
+  border-color: rgba(68,255,170,0.5);
+}
+
+/* Active / listening state */
+.mic-btn.active {
+  background: rgba(68,255,170,0.2);
+  border-color: rgba(68,255,170,0.7);
+  box-shadow: 0 0 24px rgba(68,255,170,0.3);
+  animation: micPulse 2s ease-in-out infinite;
+}
+
+.mic-btn:focus-visible {
+  outline: 2px solid rgba(68,255,170,0.6);
+  outline-offset: 4px;
+}
+
+@keyframes micPulse {
+  0%, 100% { box-shadow: 0 0 24px rgba(68,255,170,0.3); }
+  50%       { box-shadow: 0 0 40px rgba(68,255,170,0.55); }
+}
+
+.mic-icon { font-size: 1.1rem; }
+
+/* =============================================
+   STATUS MESSAGE
+   ============================================= */
+.mic-status {
+  position: fixed;
+  bottom: 6.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  color: rgba(255,100,80,0.85);
+  font-family: 'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* =============================================
+   HINT
+   ============================================= */
+.hint {
+  position: fixed;
+  top: 3.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hint-text {
+  display: inline-block;
+  padding: 0.4rem 1.1rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  color: rgba(255,255,255,0.35);
+  font-size: 0.76rem;
+  font-family: 'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(8px);
+  animation: hintFade 5s ease 2s forwards;
+  opacity: 1;
+}
+
+@keyframes hintFade {
+  0%   { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}

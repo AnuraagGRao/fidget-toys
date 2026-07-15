@@ -1,0 +1,248 @@
+/* =============================================
+   BASE RESET & TOKENS
+   ============================================= */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:        #09090f;
+  --surface:   rgba(255,255,255,0.04);
+  --border:    rgba(255,255,255,0.08);
+  --text:      #e2e2ea;
+  --text-dim:  #888899;
+  --radius:    16px;
+  --transition: 0.22s ease;
+  font-size: 16px;
+}
+
+html, body {
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* =============================================
+   ANIMATED BACKGROUND GRADIENT
+   ============================================= */
+.bg-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%,  rgba(255,68,102,0.06)  0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 20%,  rgba(68,170,255,0.06)  0%, transparent 55%),
+    radial-gradient(ellipse 70% 60% at 50% 90%,  rgba(68,255,170,0.05)  0%, transparent 60%);
+  animation: bgShift 18s ease-in-out infinite alternate;
+}
+
+@keyframes bgShift {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* =============================================
+   LAYOUT WRAPPERS
+   ============================================= */
+.site-header,
+main,
+.site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* =============================================
+   HEADER
+   ============================================= */
+.site-header {
+  text-align: center;
+  padding: clamp(2.5rem, 8vw, 5rem) 1.5rem 1rem;
+}
+
+.site-title {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.55));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.site-subtitle {
+  margin-top: 0.5rem;
+  color: var(--text-dim);
+  font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+  letter-spacing: 0.02em;
+}
+
+/* =============================================
+   TOYS GRID
+   ============================================= */
+.toys-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  max-width: 1280px;
+  margin: 2.5rem auto 0;
+  padding: 0 1.25rem 3rem;
+}
+
+/* =============================================
+   TOY CARD
+   ============================================= */
+.toy-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 2rem 1.75rem 1.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text);
+  overflow: hidden;
+  transition:
+    transform      var(--transition),
+    background     var(--transition),
+    border-color   var(--transition),
+    box-shadow     var(--transition);
+  /* Custom properties set via inline style on each card */
+  --accent:     #fff;
+  --accent-dim: rgba(255,255,255,0.1);
+}
+
+/* Top accent stripe */
+.toy-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+/* Hover / focus */
+.toy-card:hover,
+.toy-card:focus-visible {
+  transform: translateY(-6px);
+  background: rgba(255,255,255,0.07);
+  border-color: var(--accent-dim);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.45),
+    0 0 0 1px var(--accent-dim),
+    0 0 40px var(--accent-dim);
+  outline: none;
+}
+
+.toy-card:hover::before,
+.toy-card:focus-visible::before {
+  opacity: 1;
+}
+
+/* Active (tap) */
+.toy-card:active {
+  transform: translateY(-2px);
+}
+
+/* Card contents */
+.toy-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  margin-bottom: 0.2rem;
+  filter: drop-shadow(0 0 8px var(--accent));
+  transition: filter var(--transition);
+}
+
+.toy-card:hover .toy-icon {
+  filter: drop-shadow(0 0 16px var(--accent));
+}
+
+.toy-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+.toy-desc {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  flex: 1;
+  line-height: 1.55;
+}
+
+.toy-arrow {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--accent);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.toy-card:hover .toy-arrow,
+.toy-card:focus-visible .toy-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* =============================================
+   FOOTER
+   ============================================= */
+.site-footer {
+  text-align: center;
+  padding: 0 1rem 2rem;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+/* =============================================
+   SHARED TOY-PAGE HELPERS  (used by toys/*/style.css via cascade)
+   ============================================= */
+.back-btn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px;
+  color: #ccc;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-family: inherit;
+  backdrop-filter: blur(10px);
+  transition: background var(--transition), color var(--transition);
+}
+
+.back-btn:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+/* =============================================
+   RESPONSIVE TWEAKS
+   ============================================= */
+@media (max-width: 480px) {
+  .toys-grid {
+    grid-template-columns: 1fr;
+  }
+}

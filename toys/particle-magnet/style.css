@@ -1,0 +1,45 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #09090f;
+}
+
+#canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* Hint overlay */
+.hint {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hint-text {
+  display: inline-block;
+  padding: 0.4rem 1.1rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px;
+  color: rgba(255,255,255,0.45);
+  font-size: 0.78rem;
+  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(8px);
+  animation: hintFade 3s ease 1.5s forwards;
+  opacity: 1;
+}
+
+@keyframes hintFade {
+  0%   { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}

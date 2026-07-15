@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Geometric Gravity · Fidget Toys</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
+
+  <canvas id="canvas" aria-label="Geometric gravity sandbox"></canvas>
+
+  <!-- iOS 13+ requires a user-gesture to unlock DeviceOrientation -->
+  <button id="tilt-btn" class="tilt-btn hidden" aria-label="Enable tilt controls">
+    📱 Enable Tilt
+  </button>
+
+  <div class="hint" id="hint">
+    <span class="hint-text desktop-hint">Drag to throw shapes</span>
+    <span class="hint-text mobile-hint">Tilt your device</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
