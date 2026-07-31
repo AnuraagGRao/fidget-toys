@@ -200,6 +200,20 @@ main,
   transform: translateX(0);
 }
 
+/* Animated glow effect */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px var(--accent-dim);
+  }
+  50% {
+    box-shadow: 0 0 40px var(--accent-dim), 0 0 60px var(--accent-dim);
+  }
+}
+
+.toy-card:hover {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
 /* =============================================
    FOOTER
    ============================================= */

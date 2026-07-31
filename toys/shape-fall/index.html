@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shape Fall · Fidget Toys</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
+
+  <canvas id="canvas" aria-label="Shape fall — grab falling shapes with your cursor"></canvas>
+
+  <div class="controls">
+    <button class="control-btn" id="resetBtn" aria-label="Reset shapes">
+      <span class="control-icon">🔄</span>
+      <span class="control-label">Reset</span>
+    </button>
+    <button class="control-btn" id="addBtn" aria-label="Add more shapes">
+      <span class="control-icon">➕</span>
+      <span class="control-label">Add Shapes</span>
+    </button>
+  </div>
+
+  <div class="hint" id="hint">
+    <span class="hint-text">Hold shapes to grab them · Release to drop</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
