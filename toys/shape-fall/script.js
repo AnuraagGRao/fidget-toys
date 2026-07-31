@@ -10,14 +10,12 @@
   let width, height;
   let particles = [];
   let mouse = { x: null, y: null, down: false };
-  let grabbed = null;
 
   // Physics constants
-  const GRAVITY = 1.2; // Super fast gravity
-  const FRICTION = 0.98;
-  const BOUNCE = 0.65;
-  const GRAB_RADIUS = 50;
-  const LERP_SPEED = 0.3; // Smooth cursor following
+  const FRICTION = 0.995; // Very low friction for continuous movement
+  const BOUNCE = 0.85;
+  const BLACK_HOLE_STRENGTH = 1.5; // Strength of black hole gravity pull
+  const BLACK_HOLE_RADIUS = 300; // Range of black hole effect
 
   // Shape types
   const SHAPES = ['circle', 'square', 'triangle', 'star', 'pentagon', 'hexagon', 'diamond'];
@@ -41,81 +39,76 @@
     constructor(x, y) {
       this.x = x;
       this.y = y;
-      this.vx = (Math.random() - 0.5) * 8;
-      this.vy = Math.random() * -5 - 2;
+      // Random velocity in all directions for free-floating movement
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 3 + 2;
+      this.vx = Math.cos(angle) * speed;
+      this.vy = Math.sin(angle) * speed;
       this.size = Math.random() * 30 + 20;
       this.rotation = Math.random() * Math.PI * 2;
-      this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+      this.rotationSpeed = (Math.random() - 0.5) * 0.05;
       this.shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
       this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
-      this.grabbed = false;
-      this.targetX = x;
-      this.targetY = y;
       this.scale = 1;
       this.targetScale = 1;
     }
 
     update() {
-      if (this.grabbed) {
-        // Smooth lerp to cursor with spring-like effect
-        const dx = this.targetX - this.x;
-        const dy = this.targetY - this.y;
+      // Black hole gravity effect when mouse is down
+      if (mouse.down && mouse.x !== null && mouse.y !== null) {
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
         
-        this.x += dx * LERP_SPEED;
-        this.y += dy * LERP_SPEED;
-        
-        this.vx *= 0.8;
-        this.vy *= 0.8;
-        
-        this.targetScale = 1.2;
-        this.rotationSpeed *= 0.9;
-      } else {
-        // Apply gravity
-        this.vy += GRAVITY;
-        
-        // Apply velocity
-        this.x += this.vx;
-        this.y += this.vy;
-        
-        // Apply friction
-        this.vx *= FRICTION;
-        this.vy *= FRICTION;
-        
-        this.targetScale = 1;
-        
-        // Rotation
-        this.rotation += this.rotationSpeed;
-        
-        // Wall collisions
-        if (this.x - this.size / 2 < 0) {
-          this.x = this.size / 2;
-          this.vx *= -BOUNCE;
-          this.rotationSpeed *= -1;
-        }
-        if (this.x + this.size / 2 > width) {
-          this.x = width - this.size / 2;
-          this.vx *= -BOUNCE;
-          this.rotationSpeed *= -1;
-        }
-        
-        // Floor collision
-        if (this.y + this.size / 2 > height) {
-          this.y = height - this.size / 2;
-          this.vy *= -BOUNCE;
-          this.rotationSpeed *= -1;
+        if (dist < BLACK_HOLE_RADIUS && dist > 1) {
+          // Strong pull toward cursor (black hole effect)
+          const force = BLACK_HOLE_STRENGTH * (1 - dist / BLACK_HOLE_RADIUS);
+          this.vx += (dx / dist) * force;
+          this.vy += (dy / dist) * force;
           
-          // Stop if moving slowly
-          if (Math.abs(this.vy) < 0.5) {
-            this.vy = 0;
-            this.rotationSpeed *= 0.95;
-          }
+          // Visual feedback when being pulled
+          this.targetScale = 1.1;
+          this.rotationSpeed += (dx / dist) * 0.02;
         }
-        
-        // Ceiling collision
-        if (this.y - this.size / 2 < 0) {
-          this.y = this.size / 2;
-          this.vy *= -BOUNCE;
-        }
+      } else {
+        this.targetScale = 1;
+      }
+      
+      // Apply velocity
+      this.x += this.vx;
+      this.y += this.vy;
+      
+      // Apply friction (very minimal for continuous motion)
+      this.vx *= FRICTION;
+      this.vy *= FRICTION;
+      
+      // Rotation
+      this.rotation += this.rotationSpeed;
+      
+      // Wall collisions - bounce and maintain velocity
+      if (this.x - this.size / 2 < 0) {
+        this.x = this.size / 2;
+        this.vx *= -BOUNCE;
+        this.rotationSpeed *= -1;
+      }
+      if (this.x + this.size / 2 > width) {
+        this.x = width - this.size / 2;
+        this.vx *= -BOUNCE;
+        this.rotationSpeed *= -1;
+      }
+      
+      // Floor collision
+      if (this.y + this.size / 2 > height) {
+        this.y = height - this.size / 2;
+        this.vy *= -BOUNCE;
+        this.rotationSpeed *= -1;
+      }
+      
+      // Ceiling collision
+      if (this.y - this.size / 2 < 0) {
+        this.y = this.size / 2;
+        this.vy *= -BOUNCE;
+        this.rotationSpeed *= -1;
       }
       
       // Smooth scale transition
@@ -128,9 +121,9 @@
       ctx.rotate(this.rotation);
       ctx.scale(this.scale, this.scale);
       
-      // Glow effect
+      // Glow effect (stronger when being pulled by black hole)
       ctx.shadowColor = this.color;
-      ctx.shadowBlur = this.grabbed ? 30 : 15;
+      ctx.shadowBlur = (mouse.down && this.targetScale > 1) ? 30 : 15;
       
       ctx.fillStyle = this.color;
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
@@ -235,11 +228,6 @@
       ctx.stroke();
     }
 
-    contains(x, y) {
-      const dx = x - this.x;
-      const dy = y - this.y;
-      return Math.sqrt(dx * dx + dy * dy) < this.size / 2 + GRAB_RADIUS;
-    }
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -266,7 +254,6 @@
 
   function clearParticles() {
     particles = [];
-    grabbed = null;
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -282,18 +269,21 @@
       p.draw();
     });
     
-    // Draw grab radius indicator when hovering
-    if (mouse.x !== null && !mouse.down) {
-      const hovered = particles.find(p => p.contains(mouse.x, mouse.y));
-      if (hovered) {
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([5, 5]);
-        ctx.beginPath();
-        ctx.arc(hovered.x, hovered.y, hovered.size / 2 + GRAB_RADIUS, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
+    // Draw black hole radius when active
+    if (mouse.down && mouse.x !== null && mouse.y !== null) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, BLACK_HOLE_RADIUS, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // Draw center point
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, 5, 0, Math.PI * 2);
+      ctx.fill();
     }
     
     requestAnimationFrame(animate);
@@ -311,21 +301,7 @@
     mouse.x = x;
     mouse.y = y;
     
-    // Find particle under cursor
-    for (let i = particles.length - 1; i >= 0; i--) {
-      if (particles[i].contains(x, y)) {
-        grabbed = particles[i];
-        grabbed.grabbed = true;
-        grabbed.targetX = x;
-        grabbed.targetY = y;
-        canvas.classList.add('grabbing');
-        
-        // Move to end of array (draw on top)
-        particles.splice(i, 1);
-        particles.push(grabbed);
-        break;
-      }
-    }
+    canvas.classList.add('grabbing');
   }
 
   function handlePointerMove(e) {
@@ -335,26 +311,9 @@
     
     mouse.x = x;
     mouse.y = y;
-    
-    if (grabbed) {
-      grabbed.targetX = x;
-      grabbed.targetY = y;
-    }
   }
 
   function handlePointerUp() {
-    if (grabbed) {
-      grabbed.grabbed = false;
-      
-      // Add some velocity based on movement
-      const dx = mouse.x - grabbed.x;
-      const dy = mouse.y - grabbed.y;
-      grabbed.vx = dx * 0.5;
-      grabbed.vy = dy * 0.5;
-      
-      grabbed = null;
-    }
-    
     mouse.down = false;
     canvas.classList.remove('grabbing');
   }

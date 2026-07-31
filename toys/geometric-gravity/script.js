@@ -174,13 +174,17 @@ function resize () {
 }
 
 function spawnShapes () {
-  shapes = SHAPE_DEFS.map((def, i) => {
-    const radius = Math.random() * 22 + 22;   // 22–44 px
+  shapes = [];
+  // Create more shapes for better visibility
+  const shapeCount = 20;
+  for (let i = 0; i < shapeCount; i++) {
+    const def = SHAPE_DEFS[i % SHAPE_DEFS.length];
+    const radius = Math.random() * 28 + 24;   // 24–52 px (larger for visibility)
     const x = radius + Math.random() * (W - radius * 2);
-    const y = radius + Math.random() * (H * 0.5);
+    const y = radius + Math.random() * (H * 0.4);  // Spawn in upper area
     const color = PALETTE[i % PALETTE.length];
-    return new Shape(x, y, def.sides, radius, color);
-  });
+    shapes.push(new Shape(x, y, def.sides, radius, color));
+  }
 }
 
 function init () {
