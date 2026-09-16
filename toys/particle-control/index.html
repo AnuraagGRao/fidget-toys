@@ -39,25 +39,47 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // Track mouse position and clicks
-    window.addEventListener('mousemove', (e) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-    });
-    
-    window.addEventListener('mousedown', () => { mouse.isDown = true; });
-    window.addEventListener('mouseup', () => { 
-        mouse.isDown = false; 
+    // Track pointer position and clicks for mouse + touch
+    function setPointerPosition(e) {
+        const point = e.touches ? e.touches[0] : e;
+        mouse.x = point.clientX;
+        mouse.y = point.clientY;
+    }
+
+    function pointerDown(e) {
+        setPointerPosition(e);
+        mouse.isDown = true;
+    }
+
+    function pointerUp() {
+        mouse.isDown = false;
         // Explosion effect on release
         particles.forEach(p => {
             const dx = p.x - mouse.x;
             const dy = p.y - mouse.y;
             const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            const power = 10 + Math.random() * 10; 
+            const power = 10 + Math.random() * 10;
             p.vx = (dx / dist) * power;
             p.vy = (dy / dist) * power;
         });
-    });
+    }
+
+    window.addEventListener('mousemove', setPointerPosition);
+    window.addEventListener('mousedown', pointerDown);
+    window.addEventListener('mouseup', pointerUp);
+
+    window.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        pointerDown(e);
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        setPointerPosition(e);
+    }, { passive: false });
+
+    window.addEventListener('touchend', pointerUp);
+    window.addEventListener('touchcancel', pointerUp);
 
     class Particle {
         constructor() {
@@ -69,11 +91,12 @@
             // Tail settings
             this.history = [];
             this.maxHistory = 35; // Increased tail length
-            this.baseSize = 6;
+            this.baseSize = 10; // Base size of the particle
             
             // Circle formation settings
             this.angle = Math.random() * Math.PI * 2;
             this.radius = Math.random() * 80 + 20; // Spread of the circle
+            this.rotationDirection = Math.random() < 0.5 ? 1 : -1; // Mix clockwise and anti-clockwise orbits
             
             // State tracking
             this.collisionTimer = 0;
@@ -81,8 +104,9 @@
 
         update(allParticles) {
             if (mouse.isDown) {
-                // Slowly rotate their target position to create a swirling circle
-                this.angle += 0.03;
+                // Slowly rotate their target position to create a swirling circle,
+                // with a mix of clockwise and anti-clockwise motion.
+                this.angle += 0.03 * this.rotationDirection;
                 const targetX = mouse.x + Math.cos(this.angle) * this.radius;
                 const targetY = mouse.y + Math.sin(this.angle) * this.radius;
                 
@@ -93,9 +117,9 @@
                 this.vx += dx * 0.015;
                 this.vy += dy * 0.015;
             } else {
-                // Wander gently when not clicked
-                this.vx += (Math.random() - 0.5) * 0.4;
-                this.vy += (Math.random() - 0.5) * 0.4;
+                // Wander more energetically when not grabbed so the swarm stays lively.
+                this.vx += (Math.random() - 0.5) * 1.2;
+                this.vy += (Math.random() - 0.5) * 1.2;
             }
 
             // Apply friction
@@ -158,9 +182,9 @@
             // Determine Color based on state
             let hue;
             if (mouse.isDown) {
-                hue = 0; // Red when mouse is held
+                hue = 120; // Green when mouse is held
             } else if (this.collisionTimer > 0) {
-                hue = 300; // Magenta when colliding with another particle
+                hue = 0; // Red when colliding with another particle
             } else {
                 hue = 180; // Cyan base color
             }
@@ -188,6 +212,10 @@
         }
     }
 
+    // Set the number of particles based on window size
+    const particleCount = Math.floor((width * height) / 10000); // Adjust density based on screen size
+    initParticles(particleCount);
+
     // Main animation loop
     function animate() {
         ctx.fillStyle = '#000';
@@ -203,7 +231,7 @@
     }
 
     // Start the animation
-    initParticles(100);
+    initParticles(particleCount);
     animate();
 
 </script>
