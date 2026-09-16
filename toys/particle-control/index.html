@@ -30,7 +30,6 @@
     let width, height;
     let particles = [];
     let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2, isDown: false };
-    let globalHue = 0;
 
     // Adjust canvas size to fit the window
     function resize() {
@@ -54,7 +53,7 @@
             const dx = p.x - mouse.x;
             const dy = p.y - mouse.y;
             const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            const power = 15 + Math.random() * 20; // Explosion strength
+            const power = 10 + Math.random() * 10; 
             p.vx = (dx / dist) * power;
             p.vy = (dy / dist) * power;
         });
@@ -66,56 +65,117 @@
             this.y = Math.random() * height;
             this.vx = (Math.random() - 0.5) * 4;
             this.vy = (Math.random() - 0.5) * 4;
+            
+            // Tail settings
             this.history = [];
-            this.maxHistory = 15; // Length of the trail
-            this.baseSize = 4;
-            // Half the particles get a contrasting color offset (180 degrees on the color wheel)
-            this.colorOffset = Math.random() > 0.5 ? 0 : 180;
+            this.maxHistory = 35; // Increased tail length
+            this.baseSize = 6;
+            
+            // Circle formation settings
+            this.angle = Math.random() * Math.PI * 2;
+            this.radius = Math.random() * 80 + 20; // Spread of the circle
+            
+            // State tracking
+            this.collisionTimer = 0;
         }
 
-        update() {
-            // Calculate distance to mouse
-            const dx = mouse.x - this.x;
-            const dy = mouse.y - this.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            // Pull particles toward the mouse (stronger if clicked)
-            const pullStrength = mouse.isDown ? 0.05 : 0.005;
-            
-            if (dist > 0) {
-                this.vx += dx * pullStrength;
-                this.vy += dy * pullStrength;
+        update(allParticles) {
+            if (mouse.isDown) {
+                // Slowly rotate their target position to create a swirling circle
+                this.angle += 0.03;
+                const targetX = mouse.x + Math.cos(this.angle) * this.radius;
+                const targetY = mouse.y + Math.sin(this.angle) * this.radius;
+                
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
+                
+                // Much slower pull toward the mouse
+                this.vx += dx * 0.015;
+                this.vy += dy * 0.015;
+            } else {
+                // Wander gently when not clicked
+                this.vx += (Math.random() - 0.5) * 0.4;
+                this.vy += (Math.random() - 0.5) * 0.4;
             }
 
-            // Add friction so they don't accelerate infinitely
+            // Apply friction
             this.vx *= 0.92;
             this.vy *= 0.92;
 
-            // Update actual position
             this.x += this.vx;
             this.y += this.vy;
+
+            // Keep particles inside the screen bounds
+            if (this.x < 0) { this.x = 0; this.vx *= -1; }
+            if (this.x > width) { this.x = width; this.vx *= -1; }
+            if (this.y < 0) { this.y = 0; this.vy *= -1; }
+            if (this.y > height) { this.y = height; this.vy *= -1; }
+
+            // Handle Collisions (prevent passing through each other)
+            if (this.collisionTimer > 0) this.collisionTimer--;
+
+            for (let i = 0; i < allParticles.length; i++) {
+                const other = allParticles[i];
+                if (other === this) continue; // Don't check collision against itself
+
+                const dx = this.x - other.x;
+                const dy = this.y - other.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                // Minimum distance allowed (particle size + small padding)
+                const minDist = this.baseSize + 2; 
+
+                if (dist < minDist && dist > 0) {
+                    // Trigger collision color timer for both
+                    this.collisionTimer = 15;
+                    other.collisionTimer = 15;
+
+                    // Calculate how much they overlap
+                    const overlap = minDist - dist;
+                    const collisionAngle = Math.atan2(dy, dx);
+                    
+                    // Push this particle away from the other
+                    const pushX = Math.cos(collisionAngle) * (overlap / 2);
+                    const pushY = Math.sin(collisionAngle) * (overlap / 2);
+                    
+                    this.x += pushX;
+                    this.y += pushY;
+                    
+                    // Dampen velocity to prevent extreme jittering when crowded
+                    this.vx *= 0.85;
+                    this.vy *= 0.85;
+                }
+            }
 
             // Save position to history for the trail
             this.history.push({ x: this.x, y: this.y });
             if (this.history.length > this.maxHistory) {
-                this.history.shift(); // Remove oldest position
+                this.history.shift(); 
             }
         }
 
         draw() {
-            const currentHue = globalHue + this.colorOffset;
-            ctx.fillStyle = `hsl(${currentHue}, 100%, 60%)`;
+            // Determine Color based on state
+            let hue;
+            if (mouse.isDown) {
+                hue = 0; // Red when mouse is held
+            } else if (this.collisionTimer > 0) {
+                hue = 300; // Magenta when colliding with another particle
+            } else {
+                hue = 180; // Cyan base color
+            }
+
+            ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
 
             // Draw the trail
             for (let i = 0; i < this.history.length; i++) {
                 const pos = this.history[i];
-                // Trail squares get smaller the older they are
                 const size = this.baseSize * (i / this.history.length);
                 ctx.fillRect(pos.x - size / 2, pos.y - size / 2, size, size);
             }
 
             // Draw the particle head
-            ctx.fillStyle = '#fff'; // White head for contrast
+            ctx.fillStyle = '#fff';
             ctx.fillRect(this.x - this.baseSize / 2, this.y - this.baseSize / 2, this.baseSize, this.baseSize);
         }
     }
@@ -130,23 +190,20 @@
 
     // Main animation loop
     function animate() {
-        // Clear the canvas every frame
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, width, height);
 
-        // Slowly shift the global color hue
-        globalHue += 0.5;
-
+        // Pass the full array to update so particles can check collisions against each other
         particles.forEach(p => {
-            p.update();
+            p.update(particles);
             p.draw();
         });
 
         requestAnimationFrame(animate);
     }
 
-    // Start the animation with 150 particles
-    initParticles(150);
+    // Start the animation
+    initParticles(100);
     animate();
 
 </script>
