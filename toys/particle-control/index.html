@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Swarm Animation</title>
+    <style>
+        /* Reset margins and make the canvas fill the entire screen */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="particleCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    let particles = [];
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2, isDown: false };
+    let globalHue = 0;
+
+    // Adjust canvas size to fit the window
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Track mouse position and clicks
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    });
+    
+    window.addEventListener('mousedown', () => { mouse.isDown = true; });
+    window.addEventListener('mouseup', () => { 
+        mouse.isDown = false; 
+        // Explosion effect on release
+        particles.forEach(p => {
+            const dx = p.x - mouse.x;
+            const dy = p.y - mouse.y;
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            const power = 15 + Math.random() * 20; // Explosion strength
+            p.vx = (dx / dist) * power;
+            p.vy = (dy / dist) * power;
+        });
+    });
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * 4;
+            this.vy = (Math.random() - 0.5) * 4;
+            this.history = [];
+            this.maxHistory = 15; // Length of the trail
+            this.baseSize = 4;
+            // Half the particles get a contrasting color offset (180 degrees on the color wheel)
+            this.colorOffset = Math.random() > 0.5 ? 0 : 180;
+        }
+
+        update() {
+            // Calculate distance to mouse
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            // Pull particles toward the mouse (stronger if clicked)
+            const pullStrength = mouse.isDown ? 0.05 : 0.005;
+            
+            if (dist > 0) {
+                this.vx += dx * pullStrength;
+                this.vy += dy * pullStrength;
+            }
+
+            // Add friction so they don't accelerate infinitely
+            this.vx *= 0.92;
+            this.vy *= 0.92;
+
+            // Update actual position
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Save position to history for the trail
+            this.history.push({ x: this.x, y: this.y });
+            if (this.history.length > this.maxHistory) {
+                this.history.shift(); // Remove oldest position
+            }
+        }
+
+        draw() {
+            const currentHue = globalHue + this.colorOffset;
+            ctx.fillStyle = `hsl(${currentHue}, 100%, 60%)`;
+
+            // Draw the trail
+            for (let i = 0; i < this.history.length; i++) {
+                const pos = this.history[i];
+                // Trail squares get smaller the older they are
+                const size = this.baseSize * (i / this.history.length);
+                ctx.fillRect(pos.x - size / 2, pos.y - size / 2, size, size);
+            }
+
+            // Draw the particle head
+            ctx.fillStyle = '#fff'; // White head for contrast
+            ctx.fillRect(this.x - this.baseSize / 2, this.y - this.baseSize / 2, this.baseSize, this.baseSize);
+        }
+    }
+
+    // Initialize particles
+    function initParticles(count) {
+        particles = [];
+        for (let i = 0; i < count; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    // Main animation loop
+    function animate() {
+        // Clear the canvas every frame
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, width, height);
+
+        // Slowly shift the global color hue
+        globalHue += 0.5;
+
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    // Start the animation with 150 particles
+    initParticles(150);
+    animate();
+
+</script>
+</body>
+</html>
