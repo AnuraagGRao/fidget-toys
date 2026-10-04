@@ -266,3 +266,36 @@ main,
     grid-template-columns: 1fr;
   }
 }
+
+/* =============================================
+   FAVORITES
+   ============================================= */
+.favorite-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity var(--transition), transform var(--transition), color var(--transition);
+  z-index: 10;
+  padding: 0.25rem;
+}
+
+.toy-card:hover .favorite-btn,
+.toy-card:focus-visible .favorite-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.favorite-btn.is-favorite {
+  color: var(--accent);
+  opacity: 1;
+  transform: scale(1);
+}
+
+.favorite-btn:hover {
+  transform: scale(1.1);
+}
+
