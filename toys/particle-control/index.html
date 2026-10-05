@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Particle Swarm Animation</title>
+    <link rel="stylesheet" href="../../css/style.css" />
     <style>
         /* Reset margins and make the canvas fill the entire screen */
         body, html {
@@ -17,11 +17,45 @@
         canvas {
             display: block;
         }
+        /* Hint overlay */
+        .hint {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+            z-index: 10;
+        }
+        .hint-text {
+            display: inline-block;
+            padding: 0.4rem 1.1rem;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px;
+            color: rgba(255,255,255,0.45);
+            font-size: 0.78rem;
+            font-family: var(--font-mono, monospace);
+            letter-spacing: 0.04em;
+            backdrop-filter: blur(8px);
+            animation: hintFade 3s ease 1.5s forwards;
+            opacity: 1;
+        }
+        @keyframes hintFade {
+            0%   { opacity: 1; }
+            70%  { opacity: 1; }
+            100% { opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
+<a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
+
 <canvas id="particleCanvas"></canvas>
+
+<div class="hint" id="hint">
+    <span class="hint-text">Move or hold to swarm · Release to scatter</span>
+</div>
 
 <script>
     const canvas = document.getElementById('particleCanvas');
@@ -47,11 +81,13 @@
     }
 
     function pointerDown(e) {
+        if (e.target && e.target.closest && e.target.closest('.back-btn')) return;
         setPointerPosition(e);
         mouse.isDown = true;
     }
 
-    function pointerUp() {
+    function pointerUp(e) {
+        if (e && e.target && e.target.closest && e.target.closest('.back-btn')) return;
         mouse.isDown = false;
         // Explosion effect on release
         particles.forEach(p => {
@@ -69,11 +105,13 @@
     window.addEventListener('mouseup', pointerUp);
 
     window.addEventListener('touchstart', (e) => {
+        if (e.target.closest && e.target.closest('.back-btn')) return;
         e.preventDefault();
         pointerDown(e);
     }, { passive: false });
 
     window.addEventListener('touchmove', (e) => {
+        if (e.target.closest && e.target.closest('.back-btn')) return;
         e.preventDefault();
         setPointerPosition(e);
     }, { passive: false });
