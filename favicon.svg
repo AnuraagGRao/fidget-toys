@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="orbGrad1" x1="12" y1="12" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <linearGradient id="orbGrad2" x1="36" y1="12" x2="52" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#be185d" />
+    </linearGradient>
+    <linearGradient id="orbGrad3" x1="24" y1="36" x2="40" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#7e22ce" />
+    </linearGradient>
+    <linearGradient id="frameGrad" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+    <filter id="fidgetGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#a855f7" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="64" height="64" rx="16" fill="#080b11" />
+  <rect x="1.5" y="1.5" width="61" height="61" rx="14.5" stroke="url(#frameGrad)" stroke-width="1.5" stroke-opacity="0.35" />
+
+  <!-- Kinetic Tri-Spinner Arm Connectors -->
+  <path d="M22 22 L42 22 L32 44 Z" stroke="#334155" stroke-width="6" stroke-linejoin="round" fill="none" />
+  <path d="M22 22 L42 22 L32 44 Z" stroke="#1e293b" stroke-width="3" stroke-linejoin="round" fill="none" />
+
+  <!-- Central Pivot Ring -->
+  <circle cx="32" cy="29" r="6" fill="#0f172a" stroke="#64748b" stroke-width="2" />
+  <circle cx="32" cy="29" r="2.5" fill="#f8fafc" />
+
+  <!-- Tactile Bubble / Spinner Orbs (Triad) -->
+  <!-- Orb 1: Cyan -->
+  <circle cx="22" cy="20" r="8" fill="url(#orbGrad1)" filter="url(#fidgetGlow)" />
+  <ellipse cx="20" cy="18" rx="3" ry="1.5" fill="#ffffff" fill-opacity="0.5" />
+
+  <!-- Orb 2: Rose -->
+  <circle cx="42" cy="20" r="8" fill="url(#orbGrad2)" filter="url(#fidgetGlow)" />
+  <ellipse cx="40" cy="18" rx="3" ry="1.5" fill="#ffffff" fill-opacity="0.5" />
+
+  <!-- Orb 3: Purple -->
+  <circle cx="32" cy="46" r="8" fill="url(#orbGrad3)" filter="url(#fidgetGlow)" />
+  <ellipse cx="30" cy="44" rx="3" ry="1.5" fill="#ffffff" fill-opacity="0.5" />
+</svg>
