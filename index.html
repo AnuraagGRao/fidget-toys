@@ -5,8 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
-    content="A collection of interactive digital fidget toys — built with HTML5, CSS and Vanilla JS." />
-  <title>Fidget Toys</title>
+    content="A premium collection of interactive digital fidget toys — tactile bubble wrap, kinetic slime, mechanical thock switch, gravitational sandboxes, and particle swarms." />
+  <title>Fidget Toys · Mindful Digital Play</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,101 +19,203 @@
   <div class="bg-gradient" aria-hidden="true"></div>
 
   <header class="site-header">
-    <div class="site-eyebrow">INTERACTIVE TOYS</div>
+    <div class="site-eyebrow">INTERACTIVE DIGITAL SANCTUARY</div>
     <h1 class="site-title">Fidget Toys</h1>
     <p class="site-subtitle">Pick a toy. Zone out. Breathe.</p>
-    <p class="site-nav"><a href="https://anuraaggrao.com/" title="Back to portfolio">← Portfolio</a></p>
+
+    <div class="header-nav-row">
+      <a href="https://anuraaggrao.com/" class="portfolio-link" title="Back to portfolio">← Portfolio</a>
+      <button class="random-toy-btn" id="randomToyBtn" title="Launch a random toy">
+        <span>🎲 Surprise Me</span>
+      </button>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="filter-bar">
+      <div class="search-box">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input type="text" id="toySearch" placeholder="Search toys..." aria-label="Search fidget toys" />
+      </div>
+
+      <div class="filter-pills" role="tablist" aria-label="Toy categories">
+        <button class="filter-pill active" data-category="all" role="tab" aria-selected="true">All (<span id="countAll">9</span>)</button>
+        <button class="filter-pill" data-category="tactile" role="tab" aria-selected="false">Tactile &amp; Clicky</button>
+        <button class="filter-pill" data-category="physics" role="tab" aria-selected="false">Elastic &amp; Physics</button>
+        <button class="filter-pill" data-category="particles" role="tab" aria-selected="false">Particles &amp; Audio</button>
+        <button class="filter-pill" data-category="favorites" role="tab" aria-selected="false">Favorites ♥ (<span id="countFavs">0</span>)</button>
+      </div>
+    </div>
   </header>
 
   <main>
-    <div class="toys-grid">
+    <div class="toys-grid" id="toysGrid">
 
-
-      <a href="toys/particle-control/" class="toy-card highlight"
-        style="--accent:#c44dff;--accent-dim:rgba(196,77,255,0.15)"
-        aria-label="Particle Control — manipulate a swarm of interactive particles">
-        <span class="toy-icon" aria-hidden="true">✦</span>
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <h2 class="toy-name" style="margin:0">Particle Control</h2>
-          <button class="favorite-btn" data-id="particle-control" aria-label="Toggle favorite">♥</button>
+      <!-- 1. NEW: Bubble Pop -->
+      <a href="toys/bubble-pop/" class="toy-card highlight"
+        data-category="tactile"
+        style="--accent:#ff4081;--accent-dim:rgba(255,64,129,0.18)"
+        aria-label="Bubble Pop — 3D tactile bubble wrap and pop-it sheet">
+        <div class="toy-card-top">
+          <span class="toy-icon" aria-hidden="true">🫧</span>
+          <span class="toy-badge new-badge">NEW</span>
+          <button class="favorite-btn" data-id="bubble-pop" aria-label="Toggle favorite">♥</button>
         </div>
-        <p class="toy-desc">Manipulate a swarm of interactive particles with your mouse.</p>
-        <span class="toy-arrow" aria-hidden="true">→</span>
+        <h2 class="toy-name">Bubble Pop</h2>
+        <p class="toy-desc">Infinite 3D bubble wrap &amp; pop-it sheet with tactile synthesized snaps, confetti bursts, and glide popping.</p>
+        <div class="toy-card-footer">
+          <span class="toy-tag">Tactile Pop</span>
+          <span class="toy-arrow" aria-hidden="true">→</span>
+        </div>
       </a>
 
-      <a href="toys/particle-magnet/" class="toy-card" style="--accent:#ff4466;--accent-dim:rgba(255,68,102,0.15)"
-        aria-label="Particle Magnet — click and hold to attract drifting particles">
-        <span class="toy-icon" aria-hidden="true">⚛</span>
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <h2 class="toy-name" style="margin:0">Particle Magnet</h2>
-          <button class="favorite-btn" data-id="particle-magnet" aria-label="Toggle favorite">♥</button>
+      <!-- 2. NEW: Kinetic Slime -->
+      <a href="toys/kinetic-slime/" class="toy-card highlight"
+        data-category="physics"
+        style="--accent:#00ff88;--accent-dim:rgba(0,255,136,0.18)"
+        aria-label="Kinetic Slime — elastic soft-body jelly goo simulation">
+        <div class="toy-card-top">
+          <span class="toy-icon" aria-hidden="true">🧪</span>
+          <span class="toy-badge new-badge">NEW</span>
+          <button class="favorite-btn" data-id="kinetic-slime" aria-label="Toggle favorite">♥</button>
         </div>
-        <p class="toy-desc">Click &amp; hold to pull a field of drifting red and blue particles toward your cursor.</p>
-        <span class="toy-arrow" aria-hidden="true">→</span>
+        <h2 class="toy-name">Kinetic Slime</h2>
+        <p class="toy-desc">Juicy soft-body spring jelly goo. Stretch, squish, poke, and fling with procedural FM squelch sound effects.</p>
+        <div class="toy-card-footer">
+          <span class="toy-tag">Soft-Body Jelly</span>
+          <span class="toy-arrow" aria-hidden="true">→</span>
+        </div>
       </a>
 
-      <a href="toys/geometric-gravity/" class="toy-card" style="--accent:#ff9944;--accent-dim:rgba(255,153,68,0.15)"
-        aria-label="Geometric Gravity — tilt your device or drag shapes around">
-        <span class="toy-icon" aria-hidden="true">⬡</span>
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <h2 class="toy-name" style="margin:0">Geometric Gravity</h2>
-          <button class="favorite-btn" data-id="geometric-gravity" aria-label="Toggle favorite">♥</button>
-        </div>
-        <p class="toy-desc">Drag or throw geometric pieces on desktop. Tilt your phone to make them tumble.</p>
-        <span class="toy-arrow" aria-hidden="true">→</span>
-      </a>
-
-      <a href="toys/thock-switch/" class="toy-card" style="--accent:#44aaff;--accent-dim:rgba(68,170,255,0.15)"
-        aria-label="Thock Switch — press the satisfying mechanical keyboard switch">
-        <span class="toy-icon" aria-hidden="true">⌨</span>
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <h2 class="toy-name" style="margin:0">Thock Switch</h2>
+      <!-- 3. Thock Switch -->
+      <a href="toys/thock-switch/" class="toy-card"
+        data-category="tactile"
+        style="--accent:#38bdf8;--accent-dim:rgba(56,189,248,0.15)"
+        aria-label="Thock Switch — mechanical keyboard switch with custom sound profiles">
+        <div class="toy-card-top">
+          <span class="toy-icon" aria-hidden="true">⌨</span>
           <button class="favorite-btn" data-id="thock-switch" aria-label="Toggle favorite">♥</button>
         </div>
-        <p class="toy-desc">A giant mechanical keyboard switch. Press it for the most satisfying click you'll hear
-          today.</p>
-        <span class="toy-arrow" aria-hidden="true">→</span>
+        <h2 class="toy-name">Thock Switch</h2>
+        <p class="toy-desc">Mechanical keyboard switch with 4 sound profiles (Gateron Black, Cherry Blue, Holy Panda), sparks, and live CPS speed.</p>
+        <div class="toy-card-footer">
+          <span class="toy-tag">Dual-Phase Audio</span>
+          <span class="toy-arrow" aria-hidden="true">→</span>
+        </div>
       </a>
 
-      <a href="toys/flick-targets/" class="toy-card" style="--accent:#ff44aa;--accent-dim:rgba(255,68,170,0.15)"
-        aria-label="Flick Targets — pop glowing orbs with quick taps">
-        <span class="toy-icon" aria-hidden="true">◎</span>
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <h2 class="toy-name" style="margin:0">Flick Targets</h2>
+      <!-- 4. Flick Targets -->
+      <a href="toys/flick-targets/" class="toy-card"
+        data-category="tactile"
+        style="--accent:#ff44aa;--accent-dim:rgba(255,68,170,0.15)"
+        aria-label="Flick Targets — pop glowing orbs with pentatonic chimes">
+        <div class="toy-card-top">
+          <span class="toy-icon" aria-hidden="true">◎</span>
           <button class="favorite-btn" data-id="flick-targets" aria-label="Toggle favorite">♥</button>
         </div>
-        <p class="toy-desc">Soft-glowing orbs appear at random. Flick or tap to pop them with a satisfying burst.</p>
-        <span class="toy-arrow" aria-hidden="true">→</span>
+        <h2 class="toy-name">Flick Targets</h2>
+        <p class="toy-desc">Glowing orbs that chime pentatonic bells when tapped. Slice multiple orbs with one finger swipe to build combo multipliers.</p>
+        <div class="toy-card-footer">
+          <span class="toy-tag">Musical Chimes</span>
+          <span class="toy-arrow" aria-hidden="true">→</span>
+        </div>
       </a>
 
-      <a href="toys/audio-waveform/" class="toy-card" style="--accent:#44ffaa;--accent-dim:rgba(68,255,170,0.15)"
-        aria-label="Audio Waveform — microphone-reactive oscilloscope">
-        <span class="toy-icon" aria-hidden="true">〜</span>
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <h2 class="toy-name" style="margin:0">Audio Waveform</h2>
+      <!-- 5. Particle Magnet -->
+      <a href="toys/particle-magnet/" class="toy-card"
+        data-category="particles"
+        style="--accent:#00ffcc;--accent-dim:rgba(0,255,204,0.15)"
+        aria-label="Particle Magnet — dual polarity magnetic particle vortex">
+        <div class="toy-card-top">
+          <span class="toy-icon" aria-hidden="true">⚛</span>
+          <button class="favorite-btn" data-id="particle-magnet" aria-label="Toggle favorite">♥</button>
+        </div>
+        <h2 class="toy-name">Particle Magnet</h2>
+        <p class="toy-desc">Pull drifting particles into magnetic vortices or blast repulsion shockwaves with continuous electrical audio drones.</p>
+        <div class="toy-card-footer">
+          <span class="toy-tag">Dual Polarity</span>
+          <span class="toy-arrow" aria-hidden="true">→</span>
+        </div>
+      </a>
+
+      <!-- 6. Geometric Gravity -->
+      <a href="toys/geometric-gravity/" class="toy-card"
+        data-category="physics"
+        style="--accent:#ff9944;--accent-dim:rgba(255,153,68,0.15)"
+        aria-label="Geometric Gravity — physics sandbox with marimba percussion">
+        <div class="toy-card-top">
+          <span class="toy-icon" aria-hidden="true">⬡</span>
+          <button class="favorite-btn" data-id="geometric-gravity" aria-label="Toggle favorite">♥</button>
+        </div>
+        <h2 class="toy-name">Geometric Gravity</h2>
+        <p class="toy-desc">Throw geometric shapes or tilt your phone. Features Zero-G and Anti-Gravity with acoustic marimba collision clacks.</p>
+        <div class="toy-card-footer">
+          <span class="toy-tag">Marimba Physics</span>
+          <span class="toy-arrow" aria-hidden="true">→</span>
+        </div>
+      </a>
+
+      <!-- 7. Audio Waveform -->
+      <a href="toys/audio-waveform/" class="toy-card"
+        data-category="particles"
+        style="--accent:#44ffaa;--accent-dim:rgba(68,255,170,0.15)"
+        aria-label="Audio Waveform — oscilloscope and interactive theremin pad">
+        <div class="toy-card-top">
+          <span class="toy-icon" aria-hidden="true">〜</span>
           <button class="favorite-btn" data-id="audio-waveform" aria-label="Toggle favorite">♥</button>
         </div>
-        <p class="toy-desc">A live oscilloscope that reacts to any sound around you — music, voice, anything.</p>
-        <span class="toy-arrow" aria-hidden="true">→</span>
+        <h2 class="toy-name">Audio Waveform</h2>
+        <p class="toy-desc">Touch the canvas to play an ethereal synthesizer theremin or enable the microphone. Includes Radial Mandala and Laser Ribbons.</p>
+        <div class="toy-card-footer">
+          <span class="toy-tag">Theremin &amp; Mic</span>
+          <span class="toy-arrow" aria-hidden="true">→</span>
+        </div>
       </a>
 
-      <a href="toys/shape-fall/" class="toy-card" style="--accent:#c44dff;--accent-dim:rgba(196,77,255,0.15)"
-        aria-label="Shape Fall — grab and throw colorful falling shapes">
-        <span class="toy-icon" aria-hidden="true">★</span>
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <h2 class="toy-name" style="margin:0">Shape Fall</h2>
+      <!-- 8. Particle Control -->
+      <a href="toys/particle-control/" class="toy-card"
+        data-category="particles"
+        style="--accent:#c44dff;--accent-dim:rgba(196,77,255,0.15)"
+        aria-label="Particle Control — bioluminescent swarm with harmonic drone">
+        <div class="toy-card-top">
+          <span class="toy-icon" aria-hidden="true">✦</span>
+          <button class="favorite-btn" data-id="particle-control" aria-label="Toggle favorite">♥</button>
+        </div>
+        <h2 class="toy-name">Particle Control</h2>
+        <p class="toy-desc">Luminous bioluminescent swarm with additive glowing trails, vortex orbits, and ambient generative harmonic drones.</p>
+        <div class="toy-card-footer">
+          <span class="toy-tag">Bioluminescence</span>
+          <span class="toy-arrow" aria-hidden="true">→</span>
+        </div>
+      </a>
+
+      <!-- 9. Shape Fall -->
+      <a href="toys/shape-fall/" class="toy-card"
+        data-category="physics"
+        style="--accent:#ffd93d;--accent-dim:rgba(255,217,61,0.15)"
+        aria-label="Shape Fall — black hole gravitational attractor">
+        <div class="toy-card-top">
+          <span class="toy-icon" aria-hidden="true">★</span>
           <button class="favorite-btn" data-id="shape-fall" aria-label="Toggle favorite">♥</button>
         </div>
-        <p class="toy-desc">Grab colorful shapes as they fall with super-fast gravity. Throw them around or watch them
-          pile up.</p>
-        <span class="toy-arrow" aria-hidden="true">→</span>
+        <h2 class="toy-name">Shape Fall</h2>
+        <p class="toy-desc">Trigger gravitational black holes or supernova repulsion blasts to scatter colorful neon geometric shapes.</p>
+        <div class="toy-card-footer">
+          <span class="toy-tag">Gravitational Vortex</span>
+          <span class="toy-arrow" aria-hidden="true">→</span>
+        </div>
       </a>
 
+    </div>
+
+    <!-- Empty search / favorites state -->
+    <div id="noResults" class="no-results" hidden>
+      <span class="no-results-icon">🍃</span>
+      <p class="no-results-text">No toys matched your filter.</p>
     </div>
   </main>
 
   <footer class="site-footer">
-    <p>Built with ♥ using HTML5 · CSS · Vanilla JS</p>
+    <p>Crafted for peaceful minds · HTML5 · Web Audio API · Vanilla JS</p>
   </footer>
 
   <script src="js/main.js"></script>

@@ -1,50 +1,83 @@
 (() => {
   'use strict';
 
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
-  const resetBtn = document.getElementById('resetBtn');
-  const addBtn = document.getElementById('addBtn');
-  const hint = document.getElementById('hint');
+  const canvas      = document.getElementById('canvas');
+  const ctx         = canvas.getContext('2d');
+  const resetBtn    = document.getElementById('resetBtn');
+  const addBtn      = document.getElementById('addBtn');
+  const forceSelect = document.getElementById('forceMode');
+  const soundToggle = document.getElementById('soundToggle');
+  const soundIcon   = document.getElementById('soundIcon');
 
   let width, height;
   let particles = [];
   let mouse = { x: null, y: null, down: false };
+  let currentForce = 'blackhole';
+
+  let audioCtx   = null;
+  let soundMuted = localStorage.getItem('shapefall_muted') === 'true';
+  let lastBounceSound = 0;
 
   // Physics constants
-  const FRICTION = 0.995; // Very low friction for continuous movement
+  const FRICTION = 0.992;
   const BOUNCE = 0.85;
-  const BLACK_HOLE_STRENGTH = 1.5; // Strength of black hole gravity pull
-  const BLACK_HOLE_RADIUS = 300; // Range of black hole effect
 
-  // Shape types
   const SHAPES = ['circle', 'square', 'triangle', 'star', 'pentagon', 'hexagon', 'diamond'];
-  
-  // Color palette
+
   const COLORS = [
-    '#ff6b9d', // Pink
-    '#c44dff', // Purple
-    '#4d9aff', // Blue
-    '#4dffdf', // Cyan
-    '#4dff88', // Green
-    '#ffd93d', // Yellow
-    '#ff6e3d', // Orange
-    '#ff4d4d', // Red
+    '#ff6b9d', '#c44dff', '#4d9aff',
+    '#4dffdf', '#4dff88', '#ffd93d',
+    '#ff6e3d', '#ff4d4d',
   ];
 
-  // ═══════════════════════════════════════════════════════════
-  // PARTICLE CLASS
-  // ═══════════════════════════════════════════════════════════
+  // ── Audio Engine ───────────────────────────────────────────
+  function initAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+
+  function playBounceSound(pitch = 1.0) {
+    if (soundMuted) return;
+    const nowMs = Date.now();
+    if (nowMs - lastBounceSound < 40) return;
+    lastBounceSound = nowMs;
+
+    initAudio();
+    if (!audioCtx) return;
+
+    const ctxA = audioCtx;
+    const now = ctxA.currentTime;
+    const osc = ctxA.createOscillator();
+    const gain = ctxA.createGain();
+
+    const freq = 320 * pitch + (Math.random() * 60 - 30);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.5, now + 0.08);
+
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+    osc.connect(gain);
+    gain.connect(ctxA.destination);
+    osc.start(now);
+    osc.stop(now + 0.095);
+  }
+
+  // ── Particle Class ─────────────────────────────────────────
   class Particle {
     constructor(x, y) {
       this.x = x;
       this.y = y;
-      // Random velocity in all directions for free-floating movement
       const angle = Math.random() * Math.PI * 2;
       const speed = Math.random() * 3 + 2;
       this.vx = Math.cos(angle) * speed;
       this.vy = Math.sin(angle) * speed;
-      this.size = Math.random() * 30 + 20;
+      this.size = Math.random() * 28 + 20;
       this.rotation = Math.random() * Math.PI * 2;
       this.rotationSpeed = (Math.random() - 0.5) * 0.05;
       this.shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
@@ -54,64 +87,69 @@
     }
 
     update() {
-      // Black hole gravity effect when mouse is down
       if (mouse.down && mouse.x !== null && mouse.y !== null) {
         const dx = mouse.x - this.x;
         const dy = mouse.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        
-        if (dist < BLACK_HOLE_RADIUS && dist > 1) {
-          // Strong pull toward cursor (black hole effect)
-          const force = BLACK_HOLE_STRENGTH * (1 - dist / BLACK_HOLE_RADIUS);
-          this.vx += (dx / dist) * force;
-          this.vy += (dy / dist) * force;
-          
-          // Visual feedback when being pulled
-          this.targetScale = 1.1;
-          this.rotationSpeed += (dx / dist) * 0.02;
+
+        if (dist > 1) {
+          if (currentForce === 'blackhole' && dist < 360) {
+            const force = 2.0 * (1 - dist / 360);
+            this.vx += (dx / dist) * force;
+            this.vy += (dy / dist) * force;
+            this.targetScale = 1.15;
+          } else if (currentForce === 'supernova' && dist < 320) {
+            const force = 3.5 * (1 - dist / 320);
+            this.vx -= (dx / dist) * force;
+            this.vy -= (dy / dist) * force;
+            this.targetScale = 0.85;
+          }
         }
       } else {
         this.targetScale = 1;
       }
-      
-      // Apply velocity
+
       this.x += this.vx;
       this.y += this.vy;
-      
-      // Apply friction (very minimal for continuous motion)
+
       this.vx *= FRICTION;
       this.vy *= FRICTION;
-      
-      // Rotation
+
       this.rotation += this.rotationSpeed;
-      
-      // Wall collisions - bounce and maintain velocity
-      if (this.x - this.size / 2 < 0) {
-        this.x = this.size / 2;
+
+      // Wall collisions
+      const half = this.size / 2;
+      let bounced = false;
+
+      if (this.x - half < 0) {
+        this.x = half;
         this.vx *= -BOUNCE;
         this.rotationSpeed *= -1;
+        bounced = true;
       }
-      if (this.x + this.size / 2 > width) {
-        this.x = width - this.size / 2;
+      if (this.x + half > width) {
+        this.x = width - half;
         this.vx *= -BOUNCE;
         this.rotationSpeed *= -1;
+        bounced = true;
       }
-      
-      // Floor collision
-      if (this.y + this.size / 2 > height) {
-        this.y = height - this.size / 2;
+      if (this.y - half < 70) { // Keep below header
+        this.y = 70 + half;
         this.vy *= -BOUNCE;
         this.rotationSpeed *= -1;
+        bounced = true;
       }
-      
-      // Ceiling collision
-      if (this.y - this.size / 2 < 0) {
-        this.y = this.size / 2;
+      if (this.y + half > height) {
+        this.y = height - half;
         this.vy *= -BOUNCE;
         this.rotationSpeed *= -1;
+        bounced = true;
       }
-      
-      // Smooth scale transition
+
+      if (bounced) {
+        playBounceSound(1.0 + Math.random() * 0.3);
+      }
+
       this.scale += (this.targetScale - this.scale) * 0.15;
     }
 
@@ -120,241 +158,178 @@
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rotation);
       ctx.scale(this.scale, this.scale);
-      
-      // Glow effect (stronger when being pulled by black hole)
+
       ctx.shadowColor = this.color;
-      ctx.shadowBlur = (mouse.down && this.targetScale > 1) ? 30 : 15;
-      
+      ctx.shadowBlur = (mouse.down && this.targetScale > 1) ? 28 : 14;
+
       ctx.fillStyle = this.color;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
       ctx.lineWidth = 2;
-      
-      // Draw shape
+
       this.drawShape();
-      
       ctx.restore();
     }
 
     drawShape() {
       const r = this.size / 2;
-      
-      switch (this.shape) {
-        case 'circle':
-          ctx.beginPath();
-          ctx.arc(0, 0, r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-          break;
-          
-        case 'square':
-          ctx.fillRect(-r, -r, r * 2, r * 2);
-          ctx.strokeRect(-r, -r, r * 2, r * 2);
-          break;
-          
-        case 'triangle':
-          ctx.beginPath();
-          ctx.moveTo(0, -r);
-          ctx.lineTo(r * 0.866, r * 0.5);
-          ctx.lineTo(-r * 0.866, r * 0.5);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-          break;
-          
-        case 'star':
-          this.drawStar(0, 0, 5, r, r * 0.5);
-          break;
-          
-        case 'pentagon':
-          this.drawPolygon(0, 0, 5, r);
-          break;
-          
-        case 'hexagon':
-          this.drawPolygon(0, 0, 6, r);
-          break;
-          
-        case 'diamond':
-          ctx.beginPath();
-          ctx.moveTo(0, -r);
-          ctx.lineTo(r * 0.6, 0);
-          ctx.lineTo(0, r);
-          ctx.lineTo(-r * 0.6, 0);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-          break;
-      }
-    }
-
-    drawStar(cx, cy, spikes, outerRadius, innerRadius) {
-      let rot = Math.PI / 2 * 3;
-      let x = cx;
-      let y = cy;
-      const step = Math.PI / spikes;
-
       ctx.beginPath();
-      ctx.moveTo(cx, cy - outerRadius);
-      
-      for (let i = 0; i < spikes; i++) {
-        x = cx + Math.cos(rot) * outerRadius;
-        y = cy + Math.sin(rot) * outerRadius;
-        ctx.lineTo(x, y);
-        rot += step;
 
-        x = cx + Math.cos(rot) * innerRadius;
-        y = cy + Math.sin(rot) * innerRadius;
-        ctx.lineTo(x, y);
-        rot += step;
+      if (this.shape === 'circle') {
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+      } else if (this.shape === 'square') {
+        ctx.rect(-r, -r, this.size, this.size);
+      } else if (this.shape === 'triangle') {
+        ctx.moveTo(0, -r);
+        ctx.lineTo(r, r);
+        ctx.lineTo(-r, r);
+        ctx.closePath();
+      } else if (this.shape === 'star') {
+        for (let i = 0; i < 5; i++) {
+          const a = (i * Math.PI * 2) / 5 - Math.PI / 2;
+          const a2 = a + Math.PI / 5;
+          if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+          else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+          ctx.lineTo(Math.cos(a2) * (r * 0.45), Math.sin(a2) * (r * 0.45));
+        }
+        ctx.closePath();
+      } else if (this.shape === 'pentagon') {
+        for (let i = 0; i < 5; i++) {
+          const a = (i * Math.PI * 2) / 5 - Math.PI / 2;
+          i === 0 ? ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r) : ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+        }
+        ctx.closePath();
+      } else if (this.shape === 'hexagon') {
+        for (let i = 0; i < 6; i++) {
+          const a = (i * Math.PI * 2) / 6;
+          i === 0 ? ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r) : ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+        }
+        ctx.closePath();
+      } else if (this.shape === 'diamond') {
+        ctx.moveTo(0, -r);
+        ctx.lineTo(r, 0);
+        ctx.lineTo(0, r);
+        ctx.lineTo(-r, 0);
+        ctx.closePath();
       }
-      
-      ctx.lineTo(cx, cy - outerRadius);
-      ctx.closePath();
+
       ctx.fill();
       ctx.stroke();
     }
-
-    drawPolygon(cx, cy, sides, radius) {
-      const angle = (Math.PI * 2) / sides;
-      
-      ctx.beginPath();
-      for (let i = 0; i < sides; i++) {
-        const x = cx + radius * Math.cos(i * angle - Math.PI / 2);
-        const y = cy + radius * Math.sin(i * angle - Math.PI / 2);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }
-
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // INITIALIZATION
-  // ═══════════════════════════════════════════════════════════
-  function init() {
-    resize();
-    createParticles(15);
-    animate();
-  }
-
+  // ── Canvas Setup ───────────────────────────────────────────
   function resize() {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
   }
+  window.addEventListener('resize', resize);
+  resize();
 
-  function createParticles(count) {
+  function spawnShapes(count = 25) {
     for (let i = 0; i < count; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height * 0.3 - 100;
-      particles.push(new Particle(x, y));
+      particles.push(new Particle(Math.random() * (width - 100) + 50, Math.random() * (height - 180) + 90));
     }
   }
 
-  function clearParticles() {
+  function resetAll() {
     particles = [];
+    spawnShapes(25);
   }
+  resetAll();
 
-  // ═══════════════════════════════════════════════════════════
-  // ANIMATION LOOP
-  // ═══════════════════════════════════════════════════════════
+  // ── Render Loop ───────────────────────────────────────────
   function animate() {
     ctx.fillStyle = '#0a0a12';
     ctx.fillRect(0, 0, width, height);
-    
-    // Update and draw particles
+
+    // Subtle force glow at mouse
+    if (mouse.down && mouse.x !== null) {
+      const gCol = currentForce === 'supernova' ? 'rgba(255, 68, 68, 0.12)' : 'rgba(196, 77, 255, 0.12)';
+      const grd = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 300);
+      grd.addColorStop(0, gCol);
+      grd.addColorStop(1, 'transparent');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, width, height);
+    }
+
     particles.forEach(p => {
       p.update();
       p.draw();
     });
-    
-    // Draw black hole radius when active
-    if (mouse.down && mouse.x !== null && mouse.y !== null) {
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
-      ctx.beginPath();
-      ctx.arc(mouse.x, mouse.y, BLACK_HOLE_RADIUS, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      
-      // Draw center point
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-      ctx.beginPath();
-      ctx.arc(mouse.x, mouse.y, 5, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    
+
     requestAnimationFrame(animate);
   }
+  animate();
 
-  // ═══════════════════════════════════════════════════════════
-  // EVENT HANDLERS
-  // ═══════════════════════════════════════════════════════════
-  function handlePointerDown(e) {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
+  // ── Pointer Tracking ───────────────────────────────────────
+  function setPos(e) {
+    const point = e.touches ? e.touches[0] : e;
+    if (point) {
+      mouse.x = point.clientX;
+      mouse.y = point.clientY;
+    }
+  }
+
+  canvas.addEventListener('mousedown', (e) => {
+    initAudio();
+    setPos(e);
     mouse.down = true;
-    mouse.x = x;
-    mouse.y = y;
-    
     canvas.classList.add('grabbing');
-  }
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      try { navigator.vibrate(10); } catch {}
+    }
+  });
 
-  function handlePointerMove(e) {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    mouse.x = x;
-    mouse.y = y;
-  }
-
-  function handlePointerUp() {
+  window.addEventListener('mousemove', setPos);
+  window.addEventListener('mouseup', () => {
     mouse.down = false;
     canvas.classList.remove('grabbing');
-  }
+  });
 
-  function handlePointerLeave() {
-    handlePointerUp();
-    mouse.x = null;
-    mouse.y = null;
-  }
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    initAudio();
+    setPos(e);
+    mouse.down = true;
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      try { navigator.vibrate(10); } catch {}
+    }
+  }, { passive: false });
 
-  // ═══════════════════════════════════════════════════════════
-  // BUTTON HANDLERS
-  // ═══════════════════════════════════════════════════════════
-  resetBtn.addEventListener('click', () => {
-    clearParticles();
-    createParticles(15);
-    
-    // Visual feedback
-    resetBtn.style.transform = 'scale(0.9)';
-    setTimeout(() => resetBtn.style.transform = '', 100);
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    setPos(e);
+  }, { passive: false });
+
+  window.addEventListener('touchend', () => {
+    mouse.down = false;
+  });
+
+  // ── UI Actions ─────────────────────────────────────────────
+  forceSelect.addEventListener('change', () => {
+    currentForce = forceSelect.value;
   });
 
   addBtn.addEventListener('click', () => {
-    createParticles(5);
-    
-    // Visual feedback
-    addBtn.style.transform = 'scale(0.9)';
-    setTimeout(() => addBtn.style.transform = '', 100);
+    spawnShapes(10);
+    playBounceSound(1.5);
   });
 
-  // ═══════════════════════════════════════════════════════════
-  // EVENT LISTENERS
-  // ═══════════════════════════════════════════════════════════
-  canvas.addEventListener('pointerdown', handlePointerDown);
-  canvas.addEventListener('pointermove', handlePointerMove);
-  canvas.addEventListener('pointerup', handlePointerUp);
-  canvas.addEventListener('pointerleave', handlePointerLeave);
-  window.addEventListener('resize', resize);
+  resetBtn.addEventListener('click', () => {
+    resetAll();
+    playBounceSound(0.8);
+  });
 
-  // ═══════════════════════════════════════════════════════════
-  // START
-  // ═══════════════════════════════════════════════════════════
-  init();
+  function updateSoundUI() {
+    soundIcon.textContent = soundMuted ? '🔇' : '🔊';
+    soundToggle.classList.toggle('muted', soundMuted);
+  }
+
+  soundToggle.addEventListener('click', () => {
+    soundMuted = !soundMuted;
+    localStorage.setItem('shapefall_muted', soundMuted);
+    updateSoundUI();
+    if (!soundMuted) playBounceSound(1.2);
+  });
+  updateSoundUI();
 })();

@@ -2,13 +2,52 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Geometric Gravity · Fidget Toys</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
 </head>
 <body>
   <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
+
+  <header class="gravity-header">
+    <div class="gravity-brand">
+      <span class="brand-icon">⬡</span>
+      <h1 class="brand-title">Geometric Gravity</h1>
+    </div>
+
+    <div class="gravity-controls">
+      <div class="control-group">
+        <label for="gravityMode" class="ctrl-label">Gravity</label>
+        <select id="gravityMode" class="ctrl-select">
+          <option value="down">Earth 1G</option>
+          <option value="zero">Zero-G Float</option>
+          <option value="up">Anti-Gravity</option>
+          <option value="repel">Center Repel</option>
+        </select>
+      </div>
+
+      <button class="action-btn" id="addShapesBtn" title="Add 5 shapes">
+        <span class="btn-icon">+</span>
+        <span class="btn-text">Add</span>
+      </button>
+
+      <button class="action-btn" id="resetBtn" title="Reset Sandbox">
+        <span class="btn-icon">↺</span>
+        <span class="btn-text">Reset</span>
+      </button>
+
+      <button class="action-btn icon-only" id="soundToggle" aria-label="Toggle sound" title="Sound Mute/Unmute">
+        <span id="soundIcon">🔊</span>
+      </button>
+    </div>
+  </header>
 
   <canvas id="canvas" aria-label="Geometric gravity sandbox"></canvas>
 
@@ -18,8 +57,8 @@
   </button>
 
   <div class="hint" id="hint">
-    <span class="hint-text desktop-hint">Drag to throw shapes</span>
-    <span class="hint-text mobile-hint">Tilt your device</span>
+    <span class="hint-text desktop-hint">💡 Drag or throw shapes · Impact produces marimba clacks</span>
+    <span class="hint-text mobile-hint">💡 Tilt phone or drag shapes to throw</span>
   </div>
 
   <script src="script.js"></script>

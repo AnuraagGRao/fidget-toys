@@ -2,18 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Thock Switch · Fidget Toys</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
 </head>
-<body>
+<body data-switch="gateron" data-rgb="reactive">
   <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
 
-  <main class="switch-scene" aria-label="Mechanical keyboard switch — press to hear the thock">
+  <header class="switch-header">
+    <div class="header-brand">
+      <span class="brand-icon">⌨</span>
+      <h1 class="brand-title">Thock Switch</h1>
+    </div>
 
+    <!-- Controls ribbon -->
+    <div class="switch-controls">
+      <!-- Switch Profile Selector -->
+      <div class="control-group" title="Switch Sound Profile">
+        <label for="switchType" class="ctrl-label">Switch</label>
+        <select id="switchType" class="ctrl-select" aria-label="Select switch sound profile">
+          <option value="gateron">Gateron Black (Deep Thock)</option>
+          <option value="cherry">Cherry Blue (Crisp Click)</option>
+          <option value="panda">Holy Panda (Snappy Clack)</option>
+          <option value="silent">Silent Linear (Velvet Mute)</option>
+        </select>
+      </div>
+
+      <!-- RGB Lighting Selector -->
+      <div class="control-group" title="Backlight Mode">
+        <label for="rgbMode" class="ctrl-label">RGB</label>
+        <select id="rgbMode" class="ctrl-select" aria-label="Select RGB backlight mode">
+          <option value="reactive">Reactive Pulse</option>
+          <option value="rainbow">Rainbow Wave</option>
+          <option value="amber">Warm Amber</option>
+          <option value="cyan">Neon Cyan</option>
+        </select>
+      </div>
+
+      <button class="action-btn icon-only" id="soundToggle" aria-label="Toggle sound" title="Sound Mute/Unmute">
+        <span id="soundIcon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="switch-scene" aria-label="Mechanical keyboard switch — press to hear the thock">
     <!-- Subtle radial glow behind the switch -->
-    <div class="scene-glow" aria-hidden="true"></div>
+    <div class="scene-glow" id="sceneGlow" aria-hidden="true"></div>
 
     <div class="switch-wrapper" id="switchWrapper">
       <!-- Plate / PCB base -->
@@ -25,7 +66,7 @@
       </div>
 
       <!-- Switch housing (transparent body) -->
-      <div class="housing" aria-hidden="true">
+      <div class="housing" id="housing" aria-hidden="true">
         <!-- Spring visible inside -->
         <div class="spring" id="spring"></div>
         <!-- LED window glow -->
@@ -38,19 +79,28 @@
               aria-label="Press the switch"
               aria-pressed="false">
         <span class="keycap-legend" aria-hidden="true">⌨</span>
-        <span class="keycap-sub"    aria-hidden="true">THOCK</span>
+        <span class="keycap-sub" id="keycapSub" aria-hidden="true">THOCK</span>
       </button>
     </div>
 
-    <!-- Press counter -->
-    <div class="counter" id="counter" aria-live="polite">
-      <span class="counter-value" id="counterValue">0</span>
-      <span class="counter-label">presses</span>
+    <!-- HUD Stats: Press counter + Live CPS meter -->
+    <div class="hud-stats">
+      <div class="counter" id="counter" aria-live="polite">
+        <span class="counter-value" id="counterValue">0</span>
+        <span class="counter-label">presses</span>
+      </div>
+
+      <div class="counter cps-counter" title="Clicks Per Second">
+        <span class="counter-value" id="cpsValue">0.0</span>
+        <span class="counter-label">CPS speed</span>
+      </div>
     </div>
   </main>
 
+  <canvas id="sparksCanvas" class="sparks-canvas" aria-hidden="true"></canvas>
+
   <div class="hint">
-    <span class="hint-text">Click or tap the key</span>
+    <span class="hint-text">Click, tap, or mash Spacebar</span>
   </div>
 
   <script src="script.js"></script>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Bubble Pop · Fidget Toys</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body data-theme="rainbow">
+  <div class="bg-mesh" aria-hidden="true"></div>
+
+  <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
+
+  <header class="pop-header">
+    <div class="pop-brand">
+      <span class="brand-icon">🫧</span>
+      <h1 class="brand-title">Bubble Pop</h1>
+    </div>
+
+    <!-- Stats & Counters -->
+    <div class="pop-stats">
+      <div class="stat-pill">
+        <span class="stat-num" id="popCount">0</span>
+        <span class="stat-label">popped</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-num" id="sheetRemaining">48</span>
+        <span class="stat-label">left</span>
+      </div>
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="pop-controls">
+      <div class="theme-picker" role="radiogroup" aria-label="Bubble Theme">
+        <button class="theme-btn active" data-theme="rainbow" title="Rainbow Pop-It" aria-label="Rainbow theme">🌈</button>
+        <button class="theme-btn" data-theme="bubblewrap" title="Classic Clear Wrap" aria-label="Bubble wrap theme">🫧</button>
+        <button class="theme-btn" data-theme="neon" title="Neon Cyber" aria-label="Neon theme">⚡</button>
+        <button class="theme-btn" data-theme="obsidian" title="Dark Obsidian" aria-label="Obsidian theme">💎</button>
+      </div>
+
+      <button class="action-btn" id="replenishBtn" title="Reset / Replenish all bubbles">
+        <span class="btn-icon">↺</span>
+        <span class="btn-text">Reset</span>
+      </button>
+
+      <button class="action-btn icon-only" id="soundToggle" aria-label="Toggle sound" title="Sound Mute/Unmute">
+        <span id="soundIcon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="sheet-viewport">
+    <div class="sheet-container" id="sheetContainer" role="grid" aria-label="Bubble wrap sheet">
+      <!-- Pop-it sheet generated via JS -->
+      <div class="bubble-grid" id="bubbleGrid"></div>
+    </div>
+  </main>
+
+  <canvas id="particleCanvas" class="particle-layer" aria-hidden="true"></canvas>
+
+  <div class="swipe-hint" id="swipeHint">
+    <span>💡 Tap or glide finger across bubbles to pop</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

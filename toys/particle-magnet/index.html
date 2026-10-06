@@ -2,18 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Particle Magnet · Fidget Toys</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
 </head>
-<body>
+<body data-theme="neon">
   <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
 
-  <canvas id="canvas" aria-label="Particle magnet — click and hold to attract particles"></canvas>
+  <header class="magnet-header">
+    <div class="magnet-brand">
+      <span class="brand-icon">⚛</span>
+      <h1 class="brand-title">Particle Magnet</h1>
+    </div>
+
+    <!-- Controls ribbon -->
+    <div class="magnet-controls">
+      <button class="action-btn" id="polarityBtn" title="Toggle Attract or Repel Polarity">
+        <span class="btn-icon" id="polarityIcon">🧲</span>
+        <span class="btn-text" id="polarityText">Attract</span>
+      </button>
+
+      <div class="theme-picker" role="radiogroup" aria-label="Color Palette">
+        <button class="theme-btn active" data-theme="neon" title="Cyber Neon" aria-label="Neon palette">🟢</button>
+        <button class="theme-btn" data-theme="solar" title="Solar Flare" aria-label="Solar palette">🟠</button>
+        <button class="theme-btn" data-theme="ocean" title="Bioluminescent" aria-label="Ocean palette">🔵</button>
+        <button class="theme-btn" data-theme="plasma" title="Cosmic Plasma" aria-label="Plasma palette">🟣</button>
+      </div>
+
+      <button class="action-btn icon-only" id="soundToggle" aria-label="Toggle sound" title="Sound Mute/Unmute">
+        <span id="soundIcon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <canvas id="canvas" aria-label="Particle magnet — hold to pull or push particles"></canvas>
 
   <div class="hint" id="hint">
-    <span class="hint-text">Hold to attract · Release to scatter</span>
+    <span class="hint-text">💡 Click/Touch to attract · Right-click or button to repel</span>
   </div>
 
   <script src="script.js"></script>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Kinetic Slime · Fidget Toys</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body data-theme="lime">
+  <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
+
+  <header class="slime-header">
+    <div class="slime-brand">
+      <span class="brand-icon">🧪</span>
+      <h1 class="brand-title">Kinetic Slime</h1>
+    </div>
+
+    <!-- Controls Ribbon -->
+    <div class="slime-controls">
+      <div class="theme-picker" role="radiogroup" aria-label="Slime Color">
+        <button class="theme-btn active" data-theme="lime" title="Toxic Lime" aria-label="Lime slime">🟢</button>
+        <button class="theme-btn" data-theme="plasma" title="Cosmic Plasma" aria-label="Plasma slime">🟣</button>
+        <button class="theme-btn" data-theme="bubblegum" title="Bubblegum Goo" aria-label="Bubblegum slime">🌸</button>
+        <button class="theme-btn" data-theme="mercury" title="Liquid Mercury" aria-label="Mercury slime">⚪</button>
+      </div>
+
+      <button class="action-btn" id="gravityBtn" title="Toggle Gravity">
+        <span class="btn-icon">🌌</span>
+        <span class="btn-text" id="gravityText">Zero-G</span>
+      </button>
+
+      <button class="action-btn" id="jiggleBtn" title="Jiggle & Wobble">
+        <span class="btn-icon">⚡</span>
+        <span class="btn-text">Jiggle</span>
+      </button>
+
+      <button class="action-btn icon-only" id="soundToggle" aria-label="Toggle sound" title="Sound Mute/Unmute">
+        <span id="soundIcon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="canvas-wrap">
+    <canvas id="slimeCanvas"></canvas>
+  </main>
+
+  <div class="slime-hint">
+    <span>💡 Poke, drag, stretch, or fling the slime</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

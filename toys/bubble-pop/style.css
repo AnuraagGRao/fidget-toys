@@ -1,0 +1,468 @@
+/* ============================================================
+   Bubble Pop · 3D Tactile Pop-It & Bubble Wrap Styles
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #0b0c10;
+  color: #ecedee;
+  font-family: 'Nunito Sans', -apple-system, sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Background mesh */
+.bg-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 60% at 20% 15%, rgba(196, 77, 255, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 25%, rgba(68, 170, 255, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 70% at 50% 85%, rgba(255, 68, 170, 0.06) 0%, transparent 70%);
+  transition: background 0.5s ease;
+}
+
+/* Particle Canvas */
+.particle-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Header */
+.pop-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem 1rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.pop-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: 5.5rem; /* Space for .back-btn */
+}
+
+.brand-icon {
+  font-size: 1.6rem;
+  filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.pop-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+}
+
+.stat-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff;
+  transition: transform 0.15s ease;
+}
+
+.stat-num.bump {
+  transform: scale(1.25);
+  color: #4ade80;
+}
+
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.05em;
+}
+
+.pop-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.theme-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.theme-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.theme-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ecedee;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.action-btn:active {
+  transform: translateY(1px);
+}
+
+.action-btn.icon-only {
+  padding: 0.45rem 0.65rem;
+  font-size: 0.95rem;
+}
+
+/* Viewport for the Sheet */
+.sheet-viewport {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 1.5rem 3rem;
+  overflow: hidden;
+}
+
+/* 3D Silicone Pop-it Tray Container */
+.sheet-container {
+  position: relative;
+  max-width: 95vw;
+  max-height: 78vh;
+  padding: clamp(14px, 2.5vw, 24px);
+  border-radius: clamp(24px, 4vw, 36px);
+  background: #181920;
+  border: 3px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 30px 60px -12px rgba(0, 0, 0, 0.8),
+    0 18px 36px -18px rgba(0, 0, 0, 0.7),
+    inset 0 3px 6px rgba(255, 255, 255, 0.15),
+    inset 0 -6px 16px rgba(0, 0, 0, 0.6);
+  touch-action: none; /* Prevents scroll interference while gliding */
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sheet-container.shake {
+  animation: sheetShake 0.4s ease-in-out;
+}
+
+@keyframes sheetShake {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.02) rotate(-1deg); }
+  75% { transform: scale(1.02) rotate(1deg); }
+}
+
+/* Bubble Grid */
+.bubble-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: clamp(10px, 1.8vw, 18px);
+  touch-action: none;
+}
+
+/* Individual Bubble Cell */
+.bubble {
+  position: relative;
+  width: clamp(48px, 9vw, 76px);
+  height: clamp(48px, 9vw, 76px);
+  border-radius: 50%;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+  touch-action: none;
+}
+
+/* Unpopped 3D Dome */
+.bubble:not(.popped) {
+  background: var(--b-bg, radial-gradient(circle at 35% 30%, #ff6b9d 0%, #d81b60 65%, #880e4f 100%));
+  box-shadow:
+    0 8px 16px -2px rgba(0, 0, 0, 0.5),
+    0 4px 6px -1px rgba(0, 0, 0, 0.4),
+    inset 0 -5px 10px rgba(0, 0, 0, 0.4),
+    inset 0 4px 8px rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px) scale(1);
+}
+
+/* Gloss specular reflection curve */
+.bubble:not(.popped)::after {
+  content: '';
+  position: absolute;
+  top: 14%;
+  left: 20%;
+  width: 40%;
+  height: 24%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.1) 70%, transparent 100%);
+  transform: rotate(-30deg);
+  pointer-events: none;
+}
+
+/* Active compression on press */
+.bubble:not(.popped):active,
+.bubble:not(.popped).pressing {
+  transform: translateY(2px) scale(0.92);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.6),
+    inset 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* Popped / Deflated Crater State */
+.bubble.popped {
+  background: var(--b-bg-popped, radial-gradient(circle at 50% 50%, #4a0e28 0%, #200411 90%));
+  box-shadow:
+    inset 0 6px 14px rgba(0, 0, 0, 0.85),
+    inset 0 2px 5px rgba(0, 0, 0, 0.9),
+    inset 0 -2px 4px rgba(255, 255, 255, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+  transform: translateY(3px) scale(0.94);
+  border: 1px solid rgba(0, 0, 0, 0.6);
+}
+
+.bubble.popped::after {
+  display: none;
+}
+
+/* Pop snap wave animation */
+.bubble.pop-anim {
+  animation: bubblePopEffect 0.24s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes bubblePopEffect {
+  0%   { transform: translateY(-2px) scale(1); }
+  40%  { transform: translateY(1px) scale(0.85); }
+  80%  { transform: translateY(4px) scale(1.08); }
+  100% { transform: translateY(3px) scale(0.94); }
+}
+
+/* Ripple wave upon replenish */
+.bubble.replenish-anim {
+  animation: bubbleUnpopEffect 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes bubbleUnpopEffect {
+  0%   { transform: translateY(3px) scale(0.8); opacity: 0.6; }
+  60%  { transform: translateY(-4px) scale(1.15); opacity: 1; }
+  100% { transform: translateY(-2px) scale(1); }
+}
+
+/* ── Theme Definitions ─────────────────────────────────────── */
+
+/* 1. Rainbow Theme (Row by Row) */
+body[data-theme="rainbow"] .sheet-container {
+  background: #171821;
+}
+body[data-theme="rainbow"] .row-0 {
+  --b-bg: radial-gradient(circle at 35% 30%, #ff5252 0%, #d50000 70%, #8a0000 100%);
+  --b-bg-popped: radial-gradient(circle at 50% 50%, #420606 0%, #1e0202 100%);
+}
+body[data-theme="rainbow"] .row-1 {
+  --b-bg: radial-gradient(circle at 35% 30%, #ff9100 0%, #ff6d00 70%, #993d00 100%);
+  --b-bg-popped: radial-gradient(circle at 50% 50%, #401f02 0%, #1c0d01 100%);
+}
+body[data-theme="rainbow"] .row-2 {
+  --b-bg: radial-gradient(circle at 35% 30%, #ffd600 0%, #ffab00 70%, #996000 100%);
+  --b-bg-popped: radial-gradient(circle at 50% 50%, #423502 0%, #1f1901 100%);
+}
+body[data-theme="rainbow"] .row-3 {
+  --b-bg: radial-gradient(circle at 35% 30%, #00e676 0%, #00c853 70%, #006020 100%);
+  --b-bg-popped: radial-gradient(circle at 50% 50%, #033615 0%, #011709 100%);
+}
+body[data-theme="rainbow"] .row-4 {
+  --b-bg: radial-gradient(circle at 35% 30%, #00b0ff 0%, #0091ea 70%, #004d80 100%);
+  --b-bg-popped: radial-gradient(circle at 50% 50%, #02263b 0%, #01111a 100%);
+}
+body[data-theme="rainbow"] .row-5 {
+  --b-bg: radial-gradient(circle at 35% 30%, #d500f9 0%, #aa00ff 70%, #570085 100%);
+  --b-bg-popped: radial-gradient(circle at 50% 50%, #300247 0%, #160121 100%);
+}
+body[data-theme="rainbow"] .row-6 {
+  --b-bg: radial-gradient(circle at 35% 30%, #ff4081 0%, #f50057 70%, #88002f 100%);
+  --b-bg-popped: radial-gradient(circle at 50% 50%, #420218 0%, #1c010a 100%);
+}
+body[data-theme="rainbow"] .row-7 {
+  --b-bg: radial-gradient(circle at 35% 30%, #7c4dff 0%, #651fff 70%, #310fb8 100%);
+  --b-bg-popped: radial-gradient(circle at 50% 50%, #200a52 0%, #0d0424 100%);
+}
+
+/* 2. Classic Bubble Wrap Theme (Glass Clear) */
+body[data-theme="bubblewrap"] .sheet-container {
+  background: rgba(25, 30, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(20px);
+}
+body[data-theme="bubblewrap"] .bubble {
+  --b-bg: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.45) 0%, rgba(180, 220, 255, 0.25) 50%, rgba(100, 150, 200, 0.35) 100%);
+  --b-bg-popped: radial-gradient(circle at 50% 50%, rgba(15, 20, 28, 0.8) 0%, rgba(8, 10, 15, 0.95) 100%);
+}
+body[data-theme="bubblewrap"] .bubble:not(.popped) {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.35),
+    inset 0 4px 8px rgba(255, 255, 255, 0.7),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* 3. Neon Cyber Theme */
+body[data-theme="neon"] .sheet-container {
+  background: #0d0f14;
+  border-color: #00ffcc55;
+  box-shadow: 0 0 40px rgba(0, 255, 204, 0.15), 0 30px 60px rgba(0, 0, 0, 0.9);
+}
+body[data-theme="neon"] .bubble {
+  --b-bg: radial-gradient(circle at 35% 30%, #00ffff 0%, #00b4d8 60%, #03045e 100%);
+  --b-bg-popped: radial-gradient(circle at 50% 50%, #001220 0%, #00060d 100%);
+}
+body[data-theme="neon"] .bubble:not(.popped) {
+  box-shadow:
+    0 0 16px rgba(0, 255, 255, 0.45),
+    0 8px 16px rgba(0, 0, 0, 0.6),
+    inset 0 4px 8px rgba(255, 255, 255, 0.8);
+}
+
+/* 4. Dark Obsidian Theme */
+body[data-theme="obsidian"] .sheet-container {
+  background: #111215;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+body[data-theme="obsidian"] .bubble {
+  --b-bg: radial-gradient(circle at 35% 30%, #434853 0%, #25282f 65%, #131417 100%);
+  --b-bg-popped: radial-gradient(circle at 50% 50%, #0d0e10 0%, #050506 100%);
+}
+body[data-theme="obsidian"] .bubble:not(.popped) {
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.7),
+    inset 0 3px 6px rgba(255, 255, 255, 0.35),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Hint */
+.swipe-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 0.4rem 1.1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  animation: hintPulse 4s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.3; }
+}
+
+/* Responsive */
+@media (max-width: 680px) {
+  .pop-header {
+    padding: 1rem 1rem 0.5rem;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+  .pop-brand {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+  .sheet-viewport {
+    padding: 0.5rem 0.75rem 2rem;
+  }
+  .bubble-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+  .swipe-hint {
+    bottom: 0.75rem;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.8rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .bubble-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+}

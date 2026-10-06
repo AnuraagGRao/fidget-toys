@@ -1,0 +1,219 @@
+/* ============================================================
+   Kinetic Slime · Jelly Soft-body Elastic Simulation Styles
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: #090a0f;
+  color: #ecedee;
+  font-family: 'Nunito Sans', -apple-system, sans-serif;
+  position: relative;
+}
+
+/* Header */
+.slime-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem 1rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  pointer-events: none;
+}
+
+.slime-header > * {
+  pointer-events: auto;
+}
+
+.slime-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: 5.5rem; /* Space for .back-btn */
+}
+
+.brand-icon {
+  font-size: 1.6rem;
+  filter: drop-shadow(0 2px 10px rgba(0, 255, 136, 0.4));
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff 30%, #38ef7d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body[data-theme="plasma"] .brand-title {
+  background: linear-gradient(135deg, #ffffff 30%, #c44dff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body[data-theme="bubblegum"] .brand-title {
+  background: linear-gradient(135deg, #ffffff 30%, #ff6b9d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body[data-theme="mercury"] .brand-title {
+  background: linear-gradient(135deg, #ffffff 30%, #a0aec0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.slime-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.theme-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.theme-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.theme-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: scale(1.1);
+}
+
+.theme-btn.active {
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transform: scale(1.1);
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ecedee;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.action-btn:active {
+  transform: translateY(1px);
+}
+
+.action-btn.icon-only {
+  padding: 0.45rem 0.65rem;
+  font-size: 0.95rem;
+}
+
+/* Canvas Wrapper */
+.canvas-wrap {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+#slimeCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+
+#slimeCanvas:active {
+  cursor: grabbing;
+}
+
+/* Hint */
+.slime-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.45);
+  padding: 0.4rem 1.1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  animation: hintPulse 4s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.3; }
+}
+
+/* Responsive */
+@media (max-width: 680px) {
+  .slime-header {
+    padding: 1rem 1rem 0.5rem;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+  .slime-brand {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+  .slime-hint {
+    bottom: 0.75rem;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.8rem;
+  }
+}

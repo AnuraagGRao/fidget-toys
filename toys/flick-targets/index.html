@@ -2,28 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Flick Targets · Fidget Toys</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
 </head>
 <body>
   <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
 
-  <!-- Score bar -->
-  <div class="score-bar" aria-live="polite" aria-atomic="true">
-    <div class="score-section">
-      <span class="score-label">SCORE</span>
-      <span class="score-value" id="score">0</span>
+  <!-- Header / Controls -->
+  <header class="flick-header">
+    <div class="flick-brand">
+      <span class="brand-icon">◎</span>
+      <h1 class="brand-title">Flick Targets</h1>
     </div>
-    <div class="score-section">
-      <span class="score-label">BEST</span>
-      <span class="score-value" id="best">0</span>
+
+    <!-- Score & Combo bar -->
+    <div class="score-bar" aria-live="polite" aria-atomic="true">
+      <div class="score-section">
+        <span class="score-label">SCORE</span>
+        <span class="score-value" id="score">0</span>
+      </div>
+      <div class="score-section">
+        <span class="score-label">BEST</span>
+        <span class="score-value" id="best">0</span>
+      </div>
+      <div class="combo-pill" id="comboPill" hidden>
+        <span class="combo-num" id="comboNum">x1</span>
+        <span class="combo-label">COMBO</span>
+      </div>
     </div>
-  </div>
+
+    <div class="flick-actions">
+      <button class="action-btn icon-only" id="soundToggle" aria-label="Toggle sound" title="Sound Mute/Unmute">
+        <span id="soundIcon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Canvas for slice glow trail & burst sparks -->
+  <canvas id="fxCanvas" class="fx-canvas"></canvas>
 
   <!-- Orbs container -->
-  <div id="field" class="field" aria-label="Tap the glowing orbs to pop them"></div>
+  <main id="field" class="field" aria-label="Tap or slice glowing orbs to pop them"></main>
 
   <!-- Pop score floater template (cloned in JS) -->
   <template id="floaterTpl">
@@ -31,7 +58,7 @@
   </template>
 
   <div class="hint">
-    <span class="hint-text">Tap the glowing orbs to pop them</span>
+    <span class="hint-text">💡 Tap or swipe across glowing orbs to pop and chime</span>
   </div>
 
   <script src="script.js"></script>

@@ -2,27 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Audio Waveform · Fidget Toys</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
 </head>
-<body>
+<body data-palette="emerald">
   <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
 
-  <canvas id="canvas" aria-label="Audio-reactive waveform visualiser"></canvas>
+  <header class="audio-header">
+    <div class="audio-brand">
+      <span class="brand-icon">〜</span>
+      <h1 class="brand-title">Audio Waveform</h1>
+    </div>
 
-  <!-- Mic toggle button -->
-  <button class="mic-btn" id="micBtn" aria-pressed="false" aria-label="Enable microphone">
-    <span class="mic-icon" id="micIcon">🎙</span>
-    <span class="mic-label" id="micLabel">Enable Mic</span>
-  </button>
+    <div class="audio-controls">
+      <div class="control-group">
+        <label for="waveMode" class="ctrl-label">Visual</label>
+        <select id="waveMode" class="ctrl-select">
+          <option value="wave">Oscilloscope</option>
+          <option value="mandala">Radial Mandala</option>
+          <option value="ribbon">Neon Ribbon</option>
+          <option value="bars">Spectrum Bars</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="colorPalette" class="ctrl-label">Color</label>
+        <select id="colorPalette" class="ctrl-select">
+          <option value="emerald">Emerald Laser</option>
+          <option value="cyber">Cyberpunk Pink</option>
+          <option value="solar">Solar Flare</option>
+          <option value="violet">Deep Violet</option>
+        </select>
+      </div>
+
+      <!-- Mic toggle button -->
+      <button class="action-btn" id="micBtn" aria-pressed="false" aria-label="Toggle microphone">
+        <span id="micIcon">🎙</span>
+        <span id="micLabel">Mic</span>
+      </button>
+    </div>
+  </header>
+
+  <canvas id="canvas" aria-label="Audio-reactive waveform visualiser"></canvas>
 
   <!-- Permission / error message -->
   <div class="mic-status" id="micStatus" aria-live="polite"></div>
 
   <div class="hint">
-    <span class="hint-text">Enable mic to see your voice or music as a live waveform</span>
+    <span class="hint-text">💡 Drag or touch canvas to play synthesizer theremin · Or enable Mic</span>
   </div>
 
   <script src="script.js"></script>

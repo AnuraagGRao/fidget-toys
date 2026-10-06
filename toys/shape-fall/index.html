@@ -2,29 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Shape Fall · Fidget Toys</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
 </head>
 <body>
   <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
 
-  <canvas id="canvas" aria-label="Shape fall — click to create black hole gravity and pull shapes"></canvas>
+  <header class="shape-header">
+    <div class="shape-brand">
+      <span class="brand-icon">★</span>
+      <h1 class="brand-title">Shape Fall</h1>
+    </div>
 
-  <div class="controls">
-    <button class="control-btn" id="resetBtn" aria-label="Reset shapes">
-      <span class="control-icon">🔄</span>
-      <span class="control-label">Reset</span>
-    </button>
-    <button class="control-btn" id="addBtn" aria-label="Add more shapes">
-      <span class="control-icon">➕</span>
-      <span class="control-label">Add Shapes</span>
-    </button>
-  </div>
+    <div class="shape-controls">
+      <div class="control-group">
+        <label for="forceMode" class="ctrl-label">Force</label>
+        <select id="forceMode" class="ctrl-select">
+          <option value="blackhole">Black Hole Vortex</option>
+          <option value="supernova">Supernova Blast</option>
+          <option value="zerog">Zero-G Drift</option>
+        </select>
+      </div>
+
+      <button class="action-btn" id="addBtn" title="Add 10 shapes">
+        <span class="btn-icon">+</span>
+        <span class="btn-text">Add 10</span>
+      </button>
+
+      <button class="action-btn" id="resetBtn" title="Reset Shapes">
+        <span class="btn-icon">↺</span>
+        <span class="btn-text">Reset</span>
+      </button>
+
+      <button class="action-btn icon-only" id="soundToggle" aria-label="Toggle sound" title="Sound Mute/Unmute">
+        <span id="soundIcon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <canvas id="canvas" aria-label="Shape fall — hold to pull or push shapes"></canvas>
 
   <div class="hint" id="hint">
-    <span class="hint-text">Click and hold to create a black hole · Pull shapes toward your cursor</span>
+    <span class="hint-text">💡 Click/Touch and hold to trigger black hole or blast waves</span>
   </div>
 
   <script src="script.js"></script>

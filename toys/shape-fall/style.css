@@ -3,6 +3,131 @@ html, body {
   padding: 0;
   overflow: hidden;
   background: #0a0a12;
+  font-family: 'Nunito Sans', -apple-system, sans-serif;
+  color: #ecedee;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.back-btn {
+  position: fixed;
+  top: 1.1rem;
+  left: 1.1rem;
+  z-index: 150 !important;
+}
+
+/* =============================================
+   HEADER & CONTROLS
+   ============================================= */
+.shape-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 2rem;
+  background: rgba(10, 10, 18, 0.75);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.shape-header > * {
+  pointer-events: auto;
+}
+
+.shape-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: 5.5rem;
+}
+
+.brand-icon {
+  font-size: 1.4rem;
+  color: #c44dff;
+  filter: drop-shadow(0 0 10px #c44dff);
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff 30%, #c44dff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.shape-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.ctrl-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.05em;
+}
+
+.ctrl-select {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+.ctrl-select option {
+  background: #141620;
+  color: #fff;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ecedee;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.action-btn.icon-only {
+  padding: 0.45rem 0.65rem;
+  font-size: 0.95rem;
 }
 
 #canvas {
@@ -17,106 +142,31 @@ html, body {
   cursor: grabbing;
 }
 
-/* =============================================
-   CONTROLS
-   ============================================= */
-.controls {
+/* Hint */
+.hint {
   position: fixed;
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 20;
-  display: flex;
-  gap: 1rem;
-}
-
-.control-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.8rem 1.2rem;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 12px;
-  color: rgba(255,255,255,0.7);
-  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, sans-serif;
-  cursor: pointer;
-  backdrop-filter: blur(10px);
-  transition: all 0.2s ease;
-}
-
-.control-btn:hover {
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(255,255,255,0.25);
-  color: rgba(255,255,255,0.95);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-}
-
-.control-btn:active {
-  transform: translateY(0);
-}
-
-.control-icon {
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.control-label {
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-/* =============================================
-   HINT
-   ============================================= */
-.hint {
-  position: fixed;
-  top: 5rem;
-  left: 50%;
-  transform: translateX(-50%);
   pointer-events: none;
   z-index: 10;
-}
-
-.hint-text {
-  display: inline-block;
-  padding: 0.5rem 1.3rem;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 0.4rem 1.1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 999px;
-  color: rgba(255,255,255,0.4);
-  font-size: 0.8rem;
-  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, sans-serif;
-  letter-spacing: 0.03em;
   backdrop-filter: blur(8px);
-  animation: hintFade 4s ease 2s forwards;
 }
 
-@keyframes hintFade {
-  0%   { opacity: 1; }
-  70%  { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-/* Mobile adjustments */
-@media (max-width: 600px) {
-  .controls {
-    gap: 0.7rem;
+@media (max-width: 680px) {
+  .shape-header {
+    padding: 0.75rem 1rem;
+    gap: 0.75rem;
+    justify-content: center;
   }
-  
-  .control-btn {
-    padding: 0.7rem 1rem;
-  }
-  
-  .control-icon {
-    font-size: 1.3rem;
-  }
-  
-  .control-label {
-    font-size: 0.65rem;
+  .shape-brand {
+    display: none;
   }
 }

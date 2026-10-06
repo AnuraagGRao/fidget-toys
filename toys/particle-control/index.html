@@ -1,103 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../css/style.css" />
-    <style>
-        /* Reset margins and make the canvas fill the entire screen */
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-        }
-        canvas {
-            display: block;
-        }
-        /* Hint overlay */
-        .hint {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            pointer-events: none;
-            z-index: 10;
-        }
-        .hint-text {
-            display: inline-block;
-            padding: 0.4rem 1.1rem;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 999px;
-            color: rgba(255,255,255,0.45);
-            font-size: 0.78rem;
-            font-family: var(--font-mono, monospace);
-            letter-spacing: 0.04em;
-            backdrop-filter: blur(8px);
-            animation: hintFade 3s ease 1.5s forwards;
-            opacity: 1;
-        }
-        @keyframes hintFade {
-            0%   { opacity: 1; }
-            70%  { opacity: 1; }
-            100% { opacity: 0; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Particle Control · Fidget Toys</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #050608;
+      font-family: 'Nunito Sans', -apple-system, sans-serif;
+      color: #ecedee;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 1.1rem;
+      left: 1.1rem;
+      z-index: 150 !important;
+    }
+
+    .control-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 2rem;
+      background: rgba(5, 6, 8, 0.75);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+    }
+
+    .control-header > * {
+      pointer-events: auto;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-left: 5.5rem;
+    }
+
+    .brand-icon {
+      font-size: 1.4rem;
+      color: #c44dff;
+      filter: drop-shadow(0 0 10px #c44dff);
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 30%, #c44dff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .controls-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+    }
+
+    .ctrl-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 0.05em;
+    }
+
+    .ctrl-select {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .ctrl-select option {
+      background: #141620;
+      color: #fff;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #ecedee;
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .action-btn.icon-only {
+      padding: 0.45rem 0.65rem;
+      font-size: 0.95rem;
+    }
+
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    .hint {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 10;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.4);
+      padding: 0.4rem 1.1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+
+    @media (max-width: 680px) {
+      .control-header {
+        padding: 0.75rem 1rem;
+        gap: 0.75rem;
+        justify-content: center;
+      }
+      .header-brand {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
+  <a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
 
-<a href="../../index.html" class="back-btn" aria-label="Back to home">← Back</a>
+  <header class="control-header">
+    <div class="header-brand">
+      <span class="brand-icon">✦</span>
+      <h1 class="brand-title">Particle Control</h1>
+    </div>
 
-<canvas id="particleCanvas"></canvas>
+    <div class="controls-bar">
+      <div class="control-group">
+        <label for="swarmMode" class="ctrl-label">Mode</label>
+        <select id="swarmMode" class="ctrl-select">
+          <option value="vortex">Vortex Swirl</option>
+          <option value="flock">Flocking Wave</option>
+          <option value="gravity">Black Hole</option>
+        </select>
+      </div>
 
-<div class="hint" id="hint">
-    <span class="hint-text">Move or hold to swarm · Release to scatter</span>
-</div>
+      <div class="control-group">
+        <label for="colorTheme" class="ctrl-label">Palette</label>
+        <select id="colorTheme" class="ctrl-select">
+          <option value="aurora">Aurora Neon</option>
+          <option value="cyber">Cyberpunk Pink</option>
+          <option value="solar">Solar Gold</option>
+        </select>
+      </div>
 
-<script>
+      <button class="action-btn icon-only" id="soundToggle" aria-label="Toggle sound" title="Sound Mute/Unmute">
+        <span id="soundIcon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <canvas id="particleCanvas"></canvas>
+
+  <div class="hint">
+    <span>💡 Drag or hold to swarm · Release to supernova burst</span>
+  </div>
+
+  <script>
+    'use strict';
+
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas.getContext('2d');
+    const modeSelect = document.getElementById('swarmMode');
+    const paletteSelect = document.getElementById('colorTheme');
+    const soundToggle = document.getElementById('soundToggle');
+    const soundIcon = document.getElementById('soundIcon');
 
     let width, height;
     let particles = [];
     let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2, isDown: false };
+    let currentMode = 'vortex';
+    let currentPalette = 'aurora';
+    let soundMuted = localStorage.getItem('control_muted') === 'true';
 
-    // Adjust canvas size to fit the window
+    // Audio Engine
+    let audioCtx = null;
+    let droneOsc = null;
+    let droneGain = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        droneOsc = audioCtx.createOscillator();
+        droneGain = audioCtx.createGain();
+
+        droneOsc.type = 'sine';
+        droneOsc.frequency.setValueAtTime(120, audioCtx.currentTime);
+        droneGain.gain.setValueAtTime(0, audioCtx.currentTime);
+
+        droneOsc.connect(droneGain);
+        droneGain.connect(audioCtx.destination);
+        droneOsc.start();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function updateAudio(active) {
+      if (soundMuted || !audioCtx) return;
+      const now = audioCtx.currentTime;
+      if (active) {
+        droneOsc.frequency.setTargetAtTime(180 + Math.random() * 40, now, 0.1);
+        droneGain.gain.setTargetAtTime(0.14, now, 0.1);
+      } else {
+        droneGain.gain.setTargetAtTime(0, now, 0.1);
+      }
+    }
+
+    function playBurstAudio() {
+      if (soundMuted) return;
+      initAudio();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.exponentialRampToValueAtTime(50, now + 0.2);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.22);
+    }
+
     function resize() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
     }
     window.addEventListener('resize', resize);
     resize();
 
-    // Track pointer position and clicks for mouse + touch
     function setPointerPosition(e) {
-        const point = e.touches ? e.touches[0] : e;
+      const point = e.touches ? e.touches[0] : e;
+      if (point) {
         mouse.x = point.clientX;
         mouse.y = point.clientY;
+      }
     }
 
     function pointerDown(e) {
-        if (e.target && e.target.closest && e.target.closest('.back-btn')) return;
-        setPointerPosition(e);
-        mouse.isDown = true;
+      if (e.target && e.target.closest && (e.target.closest('.back-btn') || e.target.closest('.control-header'))) return;
+      initAudio();
+      setPointerPosition(e);
+      mouse.isDown = true;
+      updateAudio(true);
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        try { navigator.vibrate(10); } catch {}
+      }
     }
 
     function pointerUp(e) {
-        if (e && e.target && e.target.closest && e.target.closest('.back-btn')) return;
-        mouse.isDown = false;
-        // Explosion effect on release
+      if (e && e.target && e.target.closest && (e.target.closest('.back-btn') || e.target.closest('.control-header'))) return;
+      if (mouse.isDown) {
+        playBurstAudio();
+        // Supernova explosion on release
         particles.forEach(p => {
-            const dx = p.x - mouse.x;
-            const dy = p.y - mouse.y;
-            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            const power = 10 + Math.random() * 10;
-            p.vx = (dx / dist) * power;
-            p.vy = (dy / dist) * power;
+          const dx = p.x - mouse.x;
+          const dy = p.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          const power = 12 + Math.random() * 12;
+          p.vx = (dx / dist) * power;
+          p.vy = (dy / dist) * power;
         });
+      }
+      mouse.isDown = false;
+      updateAudio(false);
     }
 
     window.addEventListener('mousemove', setPointerPosition);
@@ -105,173 +335,147 @@
     window.addEventListener('mouseup', pointerUp);
 
     window.addEventListener('touchstart', (e) => {
-        if (e.target.closest && e.target.closest('.back-btn')) return;
-        e.preventDefault();
-        pointerDown(e);
+      if (e.target.closest && (e.target.closest('.back-btn') || e.target.closest('.control-header'))) return;
+      e.preventDefault();
+      pointerDown(e);
     }, { passive: false });
 
     window.addEventListener('touchmove', (e) => {
-        if (e.target.closest && e.target.closest('.back-btn')) return;
-        e.preventDefault();
-        setPointerPosition(e);
+      if (e.target.closest && (e.target.closest('.back-btn') || e.target.closest('.control-header'))) return;
+      e.preventDefault();
+      setPointerPosition(e);
     }, { passive: false });
 
     window.addEventListener('touchend', pointerUp);
     window.addEventListener('touchcancel', pointerUp);
 
-    class Particle {
-        constructor() {
-            this.x = Math.random() * width;
-            this.y = Math.random() * height;
-            this.vx = (Math.random() - 0.5) * 4;
-            this.vy = (Math.random() - 0.5) * 4;
-            
-            // Tail settings
-            this.history = [];
-            this.maxHistory = 35; // Increased tail length
-            this.baseSize = 10; // Base size of the particle
-            
-            // Circle formation settings
-            this.angle = Math.random() * Math.PI * 2;
-            this.radius = Math.random() * 80 + 20; // Spread of the circle
-            this.rotationDirection = Math.random() < 0.5 ? 1 : -1; // Mix clockwise and anti-clockwise orbits
-            
-            // State tracking
-            this.collisionTimer = 0;
+    class SwarmParticle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 3;
+        this.vy = (Math.random() - 0.5) * 3;
+        this.history = [];
+        this.maxHistory = 22;
+        this.baseSize = Math.random() * 3 + 2;
+        this.angle = Math.random() * Math.PI * 2;
+        this.orbitRadius = Math.random() * 100 + 30;
+        this.rotationDir = Math.random() < 0.5 ? 1 : -1;
+        this.colorSeed = Math.random();
+      }
+
+      update() {
+        if (mouse.isDown) {
+          if (currentMode === 'vortex') {
+            this.angle += 0.04 * this.rotationDir;
+            const targetX = mouse.x + Math.cos(this.angle) * this.orbitRadius;
+            const targetY = mouse.y + Math.sin(this.angle) * this.orbitRadius;
+            this.vx += (targetX - this.x) * 0.035;
+            this.vy += (targetY - this.y) * 0.035;
+          } else if (currentMode === 'flock') {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            this.vx += dx * 0.02;
+            this.vy += dy * 0.02;
+          } else if (currentMode === 'gravity') {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const d = Math.sqrt(dx * dx + dy * dy) || 1;
+            this.vx += (dx / d) * 4.2;
+            this.vy += (dy / d) * 4.2;
+          }
+        } else {
+          this.vx += (Math.random() - 0.5) * 0.8;
+          this.vy += (Math.random() - 0.5) * 0.8;
         }
 
-        update(allParticles) {
-            if (mouse.isDown) {
-                // Slowly rotate their target position to create a swirling circle,
-                // with a mix of clockwise and anti-clockwise motion.
-                this.angle += 0.03 * this.rotationDirection;
-                const targetX = mouse.x + Math.cos(this.angle) * this.radius;
-                const targetY = mouse.y + Math.sin(this.angle) * this.radius;
-                
-                const dx = targetX - this.x;
-                const dy = targetY - this.y;
-                
-                // Much slower pull toward the mouse
-                this.vx += dx * 0.015;
-                this.vy += dy * 0.015;
-            } else {
-                // Wander more energetically when not grabbed so the swarm stays lively.
-                this.vx += (Math.random() - 0.5) * 1.2;
-                this.vy += (Math.random() - 0.5) * 1.2;
-            }
+        this.vx *= 0.94;
+        this.vy *= 0.94;
 
-            // Apply friction
-            this.vx *= 0.92;
-            this.vy *= 0.92;
+        this.x += this.vx;
+        this.y += this.vy;
 
-            this.x += this.vx;
-            this.y += this.vy;
+        // Screen bounce
+        if (this.x < 0) { this.x = 0; this.vx *= -1; }
+        if (this.x > width) { this.x = width; this.vx *= -1; }
+        if (this.y < 0) { this.y = 0; this.vy *= -1; }
+        if (this.y > height) { this.y = height; this.vy *= -1; }
 
-            // Keep particles inside the screen bounds
-            if (this.x < 0) { this.x = 0; this.vx *= -1; }
-            if (this.x > width) { this.x = width; this.vx *= -1; }
-            if (this.y < 0) { this.y = 0; this.vy *= -1; }
-            if (this.y > height) { this.y = height; this.vy *= -1; }
+        this.history.push({ x: this.x, y: this.y });
+        if (this.history.length > this.maxHistory) this.history.shift();
+      }
 
-            // Handle Collisions (prevent passing through each other)
-            if (this.collisionTimer > 0) this.collisionTimer--;
-
-            for (let i = 0; i < allParticles.length; i++) {
-                const other = allParticles[i];
-                if (other === this) continue; // Don't check collision against itself
-
-                const dx = this.x - other.x;
-                const dy = this.y - other.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                
-                // Minimum distance allowed (particle size + small padding)
-                const minDist = this.baseSize + 2; 
-
-                if (dist < minDist && dist > 0) {
-                    // Trigger collision color timer for both
-                    this.collisionTimer = 15;
-                    other.collisionTimer = 15;
-
-                    // Calculate how much they overlap
-                    const overlap = minDist - dist;
-                    const collisionAngle = Math.atan2(dy, dx);
-                    
-                    // Push this particle away from the other
-                    const pushX = Math.cos(collisionAngle) * (overlap / 2);
-                    const pushY = Math.sin(collisionAngle) * (overlap / 2);
-                    
-                    this.x += pushX;
-                    this.y += pushY;
-                    
-                    // Dampen velocity to prevent extreme jittering when crowded
-                    this.vx *= 0.85;
-                    this.vy *= 0.85;
-                }
-            }
-
-            // Save position to history for the trail
-            this.history.push({ x: this.x, y: this.y });
-            if (this.history.length > this.maxHistory) {
-                this.history.shift(); 
-            }
+      draw() {
+        let baseHue;
+        if (currentPalette === 'aurora') {
+          baseHue = mouse.isDown ? 150 : (this.colorSeed > 0.5 ? 180 : 280);
+        } else if (currentPalette === 'cyber') {
+          baseHue = mouse.isDown ? 320 : (this.colorSeed > 0.5 ? 190 : 340);
+        } else {
+          baseHue = mouse.isDown ? 45 : (this.colorSeed > 0.5 ? 20 : 55);
         }
 
-        draw() {
-            // Determine Color based on state
-            let hue;
-            if (mouse.isDown) {
-                hue = 120; // Green when mouse is held
-            } else if (this.collisionTimer > 0) {
-                hue = 0; // Red when colliding with another particle
-            } else {
-                hue = 180; // Cyan base color
-            }
-
-            ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
-
-            // Draw the trail
-            for (let i = 0; i < this.history.length; i++) {
-                const pos = this.history[i];
-                const size = this.baseSize * (i / this.history.length);
-                ctx.fillRect(pos.x - size / 2, pos.y - size / 2, size, size);
-            }
-
-            // Draw the particle head
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(this.x - this.baseSize / 2, this.y - this.baseSize / 2, this.baseSize, this.baseSize);
+        // Draw luminous trail
+        for (let i = 0; i < this.history.length; i++) {
+          const pt = this.history[i];
+          const ratio = i / this.history.length;
+          const sz = this.baseSize * ratio;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, sz, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${baseHue}, 100%, 65%, ${ratio * 0.45})`;
+          ctx.fill();
         }
+
+        // Glowing particle head
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.baseSize * 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = `hsl(${baseHue}, 100%, 65%)`;
+        ctx.shadowBlur = 14;
+        ctx.fill();
+      }
     }
 
-    // Initialize particles
-    function initParticles(count) {
-        particles = [];
-        for (let i = 0; i < count; i++) {
-            particles.push(new Particle());
-        }
-    }
+    const count = Math.min(Math.floor((width * height) / 11000), 120);
+    particles = Array.from({ length: count }, () => new SwarmParticle());
 
-    // Set the number of particles based on window size
-    const particleCount = Math.floor((width * height) / 10000); // Adjust density based on screen size
-    initParticles(particleCount);
-
-    // Main animation loop
     function animate() {
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, width, height);
+      // Fluid decay trail background
+      ctx.fillStyle = 'rgba(5, 6, 8, 0.28)';
+      ctx.fillRect(0, 0, width, height);
 
-        // Pass the full array to update so particles can check collisions against each other
-        particles.forEach(p => {
-            p.update(particles);
-            p.draw();
-        });
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      ctx.restore();
 
-        requestAnimationFrame(animate);
+      requestAnimationFrame(animate);
     }
-
-    // Start the animation
-    initParticles(particleCount);
     animate();
 
-</script>
+    modeSelect.addEventListener('change', () => {
+      currentMode = modeSelect.value;
+    });
+
+    paletteSelect.addEventListener('change', () => {
+      currentPalette = paletteSelect.value;
+    });
+
+    function updateSoundUI() {
+      soundIcon.textContent = soundMuted ? '🔇' : '🔊';
+      soundToggle.classList.toggle('muted', soundMuted);
+    }
+
+    soundToggle.addEventListener('click', () => {
+      soundMuted = !soundMuted;
+      localStorage.setItem('control_muted', soundMuted);
+      updateSoundUI();
+      if (soundMuted && droneGain) droneGain.gain.setValueAtTime(0, audioCtx.currentTime);
+    });
+    updateSoundUI();
+  </script>
 </body>
 </html>
