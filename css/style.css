@@ -301,6 +301,17 @@ main,
 @media (max-width: 480px) {
   .toys-grid {
     grid-template-columns: 1fr;
+    padding: 0 1rem 3rem;
+  }
+  .toy-card {
+    padding: 1.5rem;
+  }
+}
+
+@media (hover: none) {
+  .favorite-btn {
+    opacity: 0.65;
+    transform: scale(1);
   }
 }
 
