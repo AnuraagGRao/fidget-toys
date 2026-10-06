@@ -7,22 +7,95 @@
   padding: 0;
 }
 
-:root {
-  --bg:             #090a10;
-  --surface:        #12141c;
-  --surface-raised: #181b26;
-  --border:         #232734;
-  --border-subtle:  #191c26;
-  --border-strong:  #343b4f;
-  --text:           #ecedee;
-  --text-dim:       #8e97a8;
-  --text-subtle:    #5d6474;
-  --radius:         20px;
+:root,
+[data-theme="obsidian"] {
+  --bg:             #010102;
+  --surface:        #0E1015;
+  --surface-raised: #141720;
+  --border:         #23252A;
+  --border-subtle:  #18191D;
+  --border-strong:  #34343A;
+  --text:           #F7F8F8;
+  --text-dim:       #8A8F98;
+  --text-subtle:    #62666D;
+  --radius:         16px;
+  --accent-primary: #5E6AD2;
   --font-serif:     'Cormorant Garamond', Georgia, serif;
   --font-sans:      'Nunito Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono:      'JetBrains Mono', monospace;
   --transition:     0.24s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 16px;
+}
+
+[data-theme="cyber"] {
+  --bg:             #08090E;
+  --surface:        rgba(19, 23, 38, 0.7);
+  --surface-raised: rgba(28, 35, 58, 0.85);
+  --border:         rgba(139, 92, 246, 0.25);
+  --border-subtle:  rgba(255, 255, 255, 0.08);
+  --border-strong:  rgba(139, 92, 246, 0.5);
+  --text:           #F8FAFC;
+  --text-dim:       #A5B4FC;
+  --text-subtle:    #6366F1;
+  --radius:         22px;
+  --accent-primary: #8B5CF6;
+}
+
+[data-theme="arcade"] {
+  --bg:             #0D0E15;
+  --surface:        #181A28;
+  --surface-raised: #212538;
+  --border:         #2A2E44;
+  --border-subtle:  #1E2130;
+  --border-strong:  #00FF66;
+  --text:           #FFFFFF;
+  --text-dim:       #A0A8C0;
+  --text-subtle:    #68708C;
+  --radius:         12px;
+  --accent-primary: #00FF66;
+}
+
+[data-theme="arcade"] .bg-gradient {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px) !important;
+  background-size: 20px 20px !important;
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+[data-theme="arcade"] .toy-card {
+  border-width: 2px !important;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.85) !important;
+}
+
+[data-theme="arcade"] .toy-card:hover {
+  transform: translate(-3px, -3px) !important;
+  box-shadow: 6px 6px 0px var(--accent-primary) !important;
+}
+
+[data-theme="cyber"] .toy-card {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.95rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
 }
 
 html, body {

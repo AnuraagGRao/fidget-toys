@@ -153,6 +153,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ── Theme Switcher (Obsidian / Cyber / Arcade) ─────────────
+  const THEMES = ['obsidian', 'cyber', 'arcade'];
+  const THEME_ICONS = { obsidian: '🖤', cyber: '⚡', arcade: '🕹️' };
+  const THEME_NAMES = { obsidian: 'Obsidian', cyber: 'Cyber', arcade: 'Arcade' };
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const themeToggleIcon = document.getElementById('themeToggleIcon');
+  const themeToggleLabel = document.getElementById('themeToggleLabel');
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('user-theme', theme);
+    if (themeToggleIcon) themeToggleIcon.textContent = THEME_ICONS[theme] || '🖤';
+    if (themeToggleLabel) themeToggleLabel.textContent = THEME_NAMES[theme] || theme;
+  }
+
+  const initialTheme = localStorage.getItem('user-theme') || 'obsidian';
+  applyTheme(initialTheme);
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      playClick();
+      const current = document.documentElement.getAttribute('data-theme') || 'obsidian';
+      const nextIdx = (THEMES.indexOf(current) + 1) % THEMES.length;
+      applyTheme(THEMES[nextIdx]);
+    });
+  }
+
   // ── Init ────────────────────────────────────────────────────
   if (countAllEl) countAllEl.textContent = toyCards.length;
   updateFavoritesUI();
