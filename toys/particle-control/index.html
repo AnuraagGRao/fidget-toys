@@ -149,6 +149,13 @@
       cursor: crosshair;
     }
 
+    canvas.pixelated {
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -webkit-crisp-edges;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
     .hint {
       position: fixed;
       bottom: 2rem;
@@ -166,13 +173,51 @@
       backdrop-filter: blur(8px);
     }
 
-    @media (max-width: 680px) {
+    .perf-badge {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 20;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.65);
+      background: rgba(5, 6, 8, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      backdrop-filter: blur(12px);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .perf-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    @media (max-width: 768px) {
       .control-header {
-        padding: 0.75rem 1rem;
-        gap: 0.75rem;
-        justify-content: center;
+        padding: 0.65rem 0.8rem;
+        gap: 0.5rem;
+        justify-content: flex-end;
       }
       .header-brand {
+        display: none;
+      }
+      .controls-bar {
+        gap: 0.4rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      .control-group {
+        padding: 0.2rem 0.45rem;
+      }
+      .perf-badge {
         display: none;
       }
     }
@@ -188,6 +233,25 @@
     </div>
 
     <div class="controls-bar">
+      <div class="control-group">
+        <label for="qualitySelect" class="ctrl-label">FX / Res</label>
+        <select id="qualitySelect" class="ctrl-select">
+          <option value="retro">👾 8-Bit (4x)</option>
+          <option value="crunch">🕹️ Chunky (2x)</option>
+          <option value="fast">⚡ Fast (1x)</option>
+          <option value="ultra">✨ Ultra Glow</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="densitySelect" class="ctrl-label">Count</label>
+        <select id="densitySelect" class="ctrl-select">
+          <option value="zen">Zen (35)</option>
+          <option value="normal" selected>Normal (70)</option>
+          <option value="swarm">Swarm (130)</option>
+        </select>
+      </div>
+
       <div class="control-group">
         <label for="swarmMode" class="ctrl-label">Mode</label>
         <select id="swarmMode" class="ctrl-select">
@@ -218,22 +282,97 @@
     <span>💡 Drag or hold to swarm · Release to supernova burst</span>
   </div>
 
+  <div class="perf-badge">
+    <span class="perf-dot"></span>
+    <span id="fpsCount">60 FPS</span>
+    <span>·</span>
+    <span id="perfRes">Chunky 2x</span>
+  </div>
+
   <script>
     'use strict';
+
+    const QUALITY_CONFIGS = {
+      retro: {
+        id: 'retro',
+        label: 'Pixelated 4x',
+        pixelScale: 4,
+        isPixelated: true,
+        maxHistory: 10,
+        stepHistory: 2,
+        renderType: 'pixel',
+        baseCount: 40,
+        decayFill: 'rgba(5, 6, 8, 0.42)'
+      },
+      crunch: {
+        id: 'crunch',
+        label: 'Pixelated 2x',
+        pixelScale: 2,
+        isPixelated: true,
+        maxHistory: 14,
+        stepHistory: 1,
+        renderType: 'pixel',
+        baseCount: 70,
+        decayFill: 'rgba(5, 6, 8, 0.35)'
+      },
+      fast: {
+        id: 'fast',
+        label: 'Fast Smooth',
+        pixelScale: 1,
+        isPixelated: false,
+        maxHistory: 16,
+        stepHistory: 1,
+        renderType: 'ribbon',
+        baseCount: 85,
+        decayFill: 'rgba(5, 6, 8, 0.28)'
+      },
+      ultra: {
+        id: 'ultra',
+        label: 'Ultra Glow',
+        pixelScale: 1,
+        isPixelated: false,
+        maxHistory: 22,
+        stepHistory: 1,
+        renderType: 'glow',
+        baseCount: 115,
+        decayFill: 'rgba(5, 6, 8, 0.25)'
+      }
+    };
+
+    const DENSITY_MAP = {
+      zen: 35,
+      normal: 70,
+      swarm: 130
+    };
 
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas.getContext('2d');
     const modeSelect = document.getElementById('swarmMode');
     const paletteSelect = document.getElementById('colorTheme');
+    const qualitySelect = document.getElementById('qualitySelect');
+    const densitySelect = document.getElementById('densitySelect');
     const soundToggle = document.getElementById('soundToggle');
     const soundIcon = document.getElementById('soundIcon');
+    const fpsCountEl = document.getElementById('fpsCount');
+    const perfResEl = document.getElementById('perfRes');
 
     let width, height;
+    let pixelScale = 2;
     let particles = [];
-    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2, isDown: false };
+    let mouse = { x: window.innerWidth / 4, y: window.innerHeight / 4, isDown: false };
     let currentMode = 'vortex';
     let currentPalette = 'aurora';
+    let currentQuality = localStorage.getItem('particle_quality') || 'crunch';
+    let currentDensity = localStorage.getItem('particle_density') || 'normal';
     let soundMuted = localStorage.getItem('control_muted') === 'true';
+
+    // Set dropdown initial selections
+    qualitySelect.value = (currentQuality in QUALITY_CONFIGS) ? currentQuality : 'crunch';
+    densitySelect.value = (currentDensity in DENSITY_MAP) ? currentDensity : 'normal';
+
+    // FPS Meter
+    const frameTimes = [];
+    let lastFpsUpdate = 0;
 
     // Audio Engine
     let audioCtx = null;
@@ -246,8 +385,9 @@
         droneOsc = audioCtx.createOscillator();
         droneGain = audioCtx.createGain();
 
-        droneOsc.type = 'sine';
-        droneOsc.frequency.setValueAtTime(120, audioCtx.currentTime);
+        const isRetro = currentQuality === 'retro' || currentQuality === 'crunch';
+        droneOsc.type = isRetro ? 'square' : 'sine';
+        droneOsc.frequency.setValueAtTime(isRetro ? 90 : 120, audioCtx.currentTime);
         droneGain.gain.setValueAtTime(0, audioCtx.currentTime);
 
         droneOsc.connect(droneGain);
@@ -260,11 +400,14 @@
     function updateAudio(active) {
       if (soundMuted || !audioCtx) return;
       const now = audioCtx.currentTime;
+      const isRetro = currentQuality === 'retro' || currentQuality === 'crunch';
+      droneOsc.type = isRetro ? 'square' : 'sine';
       if (active) {
-        droneOsc.frequency.setTargetAtTime(180 + Math.random() * 40, now, 0.1);
-        droneGain.gain.setTargetAtTime(0.14, now, 0.1);
+        const freq = isRetro ? (110 + Math.floor(Math.random() * 4) * 30) : (180 + Math.random() * 40);
+        droneOsc.frequency.setTargetAtTime(freq, now, 0.08);
+        droneGain.gain.setTargetAtTime(isRetro ? 0.05 : 0.12, now, 0.08);
       } else {
-        droneGain.gain.setTargetAtTime(0, now, 0.1);
+        droneGain.gain.setTargetAtTime(0, now, 0.08);
       }
     }
 
@@ -275,34 +418,63 @@
       const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(320, now);
-      osc.frequency.exponentialRampToValueAtTime(50, now + 0.2);
-      gain.gain.setValueAtTime(0.25, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+      const isRetro = currentQuality === 'retro' || currentQuality === 'crunch';
+
+      if (isRetro) {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(220, now + 0.05);
+        osc.frequency.setValueAtTime(110, now + 0.1);
+        gain.gain.setValueAtTime(0.16, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      } else {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(50, now + 0.22);
+        gain.gain.setValueAtTime(0.24, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      }
+
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start(now);
-      osc.stop(now + 0.22);
+      osc.stop(now + 0.24);
     }
 
     function resize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      const cfg = QUALITY_CONFIGS[currentQuality] || QUALITY_CONFIGS.crunch;
+      pixelScale = cfg.pixelScale;
+      width = canvas.width = Math.max(1, Math.floor(window.innerWidth / pixelScale));
+      height = canvas.height = Math.max(1, Math.floor(window.innerHeight / pixelScale));
+
+      if (cfg.isPixelated) {
+        canvas.classList.add('pixelated');
+      } else {
+        canvas.classList.remove('pixelated');
+      }
+
+      if (perfResEl) {
+        perfResEl.textContent = `${cfg.label} (${width}×${height})`;
+      }
+
+      // Keep particles inside new dimensions
+      particles.forEach(p => {
+        if (p.x > width) p.x = Math.random() * width;
+        if (p.y > height) p.y = Math.random() * height;
+      });
     }
     window.addEventListener('resize', resize);
-    resize();
 
     function setPointerPosition(e) {
       const point = e.touches ? e.touches[0] : e;
       if (point) {
-        mouse.x = point.clientX;
-        mouse.y = point.clientY;
+        mouse.x = point.clientX / pixelScale;
+        mouse.y = point.clientY / pixelScale;
       }
     }
 
     function pointerDown(e) {
-      if (e.target && e.target.closest && (e.target.closest('.back-btn') || e.target.closest('.control-header'))) return;
+      if (e.target && e.target.closest && (e.target.closest('.back-btn') || e.target.closest('.control-header') || e.target.closest('.perf-badge'))) return;
       initAudio();
       setPointerPosition(e);
       mouse.isDown = true;
@@ -313,7 +485,7 @@
     }
 
     function pointerUp(e) {
-      if (e && e.target && e.target.closest && (e.target.closest('.back-btn') || e.target.closest('.control-header'))) return;
+      if (e && e.target && e.target.closest && (e.target.closest('.back-btn') || e.target.closest('.control-header') || e.target.closest('.perf-badge'))) return;
       if (mouse.isDown) {
         playBurstAudio();
         // Supernova explosion on release
@@ -321,7 +493,7 @@
           const dx = p.x - mouse.x;
           const dy = p.y - mouse.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          const power = 12 + Math.random() * 12;
+          const power = (8 + Math.random() * 12) / (pixelScale === 4 ? 1.4 : 1.0);
           p.vx = (dx / dist) * power;
           p.vy = (dy / dist) * power;
         });
@@ -335,13 +507,13 @@
     window.addEventListener('mouseup', pointerUp);
 
     window.addEventListener('touchstart', (e) => {
-      if (e.target.closest && (e.target.closest('.back-btn') || e.target.closest('.control-header'))) return;
+      if (e.target.closest && (e.target.closest('.back-btn') || e.target.closest('.control-header') || e.target.closest('.perf-badge'))) return;
       e.preventDefault();
       pointerDown(e);
     }, { passive: false });
 
     window.addEventListener('touchmove', (e) => {
-      if (e.target.closest && (e.target.closest('.back-btn') || e.target.closest('.control-header'))) return;
+      if (e.target.closest && (e.target.closest('.back-btn') || e.target.closest('.control-header') || e.target.closest('.perf-badge'))) return;
       e.preventDefault();
       setPointerPosition(e);
     }, { passive: false });
@@ -351,46 +523,47 @@
 
     class SwarmParticle {
       constructor() {
-        this.x = Math.random() * width;
-        this.y = Math.random() * height;
+        this.x = Math.random() * (width || window.innerWidth / pixelScale);
+        this.y = Math.random() * (height || window.innerHeight / pixelScale);
         this.vx = (Math.random() - 0.5) * 3;
         this.vy = (Math.random() - 0.5) * 3;
         this.history = [];
-        this.maxHistory = 22;
-        this.baseSize = Math.random() * 3 + 2;
+        this.baseSize = Math.random() * 2.5 + 1.8;
         this.angle = Math.random() * Math.PI * 2;
-        this.orbitRadius = Math.random() * 100 + 30;
+        this.orbitRadius = Math.random() * 90 + 25;
         this.rotationDir = Math.random() < 0.5 ? 1 : -1;
         this.colorSeed = Math.random();
       }
 
       update() {
+        const cfg = QUALITY_CONFIGS[currentQuality] || QUALITY_CONFIGS.crunch;
         if (mouse.isDown) {
           if (currentMode === 'vortex') {
-            this.angle += 0.04 * this.rotationDir;
-            const targetX = mouse.x + Math.cos(this.angle) * this.orbitRadius;
-            const targetY = mouse.y + Math.sin(this.angle) * this.orbitRadius;
-            this.vx += (targetX - this.x) * 0.035;
-            this.vy += (targetY - this.y) * 0.035;
+            this.angle += 0.045 * this.rotationDir;
+            const targetX = mouse.x + Math.cos(this.angle) * (this.orbitRadius / (pixelScale === 4 ? 1.5 : 1));
+            const targetY = mouse.y + Math.sin(this.angle) * (this.orbitRadius / (pixelScale === 4 ? 1.5 : 1));
+            this.vx += (targetX - this.x) * 0.038;
+            this.vy += (targetY - this.y) * 0.038;
           } else if (currentMode === 'flock') {
             const dx = mouse.x - this.x;
             const dy = mouse.y - this.y;
-            this.vx += dx * 0.02;
-            this.vy += dy * 0.02;
+            this.vx += dx * 0.024;
+            this.vy += dy * 0.024;
           } else if (currentMode === 'gravity') {
             const dx = mouse.x - this.x;
             const dy = mouse.y - this.y;
             const d = Math.sqrt(dx * dx + dy * dy) || 1;
-            this.vx += (dx / d) * 4.2;
-            this.vy += (dy / d) * 4.2;
+            const pull = (4.5 / (pixelScale === 4 ? 1.3 : 1));
+            this.vx += (dx / d) * pull;
+            this.vy += (dy / d) * pull;
           }
         } else {
-          this.vx += (Math.random() - 0.5) * 0.8;
-          this.vy += (Math.random() - 0.5) * 0.8;
+          this.vx += (Math.random() - 0.5) * 0.7;
+          this.vy += (Math.random() - 0.5) * 0.7;
         }
 
-        this.vx *= 0.94;
-        this.vy *= 0.94;
+        this.vx *= 0.93;
+        this.vy *= 0.93;
 
         this.x += this.vx;
         this.y += this.vy;
@@ -402,10 +575,11 @@
         if (this.y > height) { this.y = height; this.vy *= -1; }
 
         this.history.push({ x: this.x, y: this.y });
-        if (this.history.length > this.maxHistory) this.history.shift();
+        if (this.history.length > cfg.maxHistory) this.history.shift();
       }
 
       draw() {
+        const cfg = QUALITY_CONFIGS[currentQuality] || QUALITY_CONFIGS.crunch;
         let baseHue;
         if (currentPalette === 'aurora') {
           baseHue = mouse.isDown ? 150 : (this.colorSeed > 0.5 ? 180 : 280);
@@ -415,33 +589,87 @@
           baseHue = mouse.isDown ? 45 : (this.colorSeed > 0.5 ? 20 : 55);
         }
 
-        // Draw luminous trail
-        for (let i = 0; i < this.history.length; i++) {
-          const pt = this.history[i];
-          const ratio = i / this.history.length;
-          const sz = this.baseSize * ratio;
+        if (cfg.renderType === 'pixel') {
+          // Authentic chunky 8-bit / 16-bit arcade pixel blocks
+          const sz = Math.max(1, Math.round(this.baseSize / (pixelScale === 4 ? 1.3 : 1.1)));
+          // Trail blocks
+          for (let i = 0; i < this.history.length; i += cfg.stepHistory) {
+            const pt = this.history[i];
+            const ratio = (i + 1) / this.history.length;
+            const tSz = Math.max(1, Math.round(sz * ratio));
+            ctx.fillStyle = `hsla(${baseHue}, 100%, 65%, ${ratio * 0.6})`;
+            ctx.fillRect(Math.floor(pt.x - tSz / 2), Math.floor(pt.y - tSz / 2), tSz, tSz);
+          }
+          // Crisp square pixel head
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(Math.floor(this.x - sz), Math.floor(this.y - sz), sz * 2, sz * 2);
+
+        } else if (cfg.renderType === 'ribbon') {
+          // Performance mode: fast connected single-path ribbon (zero blur overhead)
+          if (this.history.length > 1) {
+            ctx.beginPath();
+            ctx.moveTo(this.history[0].x, this.history[0].y);
+            for (let i = 1; i < this.history.length; i++) {
+              ctx.lineTo(this.history[i].x, this.history[i].y);
+            }
+            ctx.strokeStyle = `hsla(${baseHue}, 100%, 65%, 0.45)`;
+            ctx.lineWidth = Math.max(1.5, this.baseSize);
+            ctx.lineCap = 'round';
+            ctx.stroke();
+          }
+          // Crisp circle head
           ctx.beginPath();
-          ctx.arc(pt.x, pt.y, sz, 0, Math.PI * 2);
-          ctx.fillStyle = `hsla(${baseHue}, 100%, 65%, ${ratio * 0.45})`;
+          ctx.arc(this.x, this.y, this.baseSize * 1.3, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+
+        } else {
+          // Ultra Glow mode: multi-arc luminous halo trails with shadowBlur
+          for (let i = 0; i < this.history.length; i++) {
+            const pt = this.history[i];
+            const ratio = i / this.history.length;
+            const sz = this.baseSize * ratio;
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, sz, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${baseHue}, 100%, 65%, ${ratio * 0.45})`;
+            ctx.fill();
+          }
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.baseSize * 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = `hsl(${baseHue}, 100%, 65%)`;
+          ctx.shadowBlur = 12;
           ctx.fill();
         }
-
-        // Glowing particle head
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.baseSize * 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = `hsl(${baseHue}, 100%, 65%)`;
-        ctx.shadowBlur = 14;
-        ctx.fill();
       }
     }
 
-    const count = Math.min(Math.floor((width * height) / 11000), 120);
-    particles = Array.from({ length: count }, () => new SwarmParticle());
+    function reseedParticles() {
+      const cfg = QUALITY_CONFIGS[currentQuality] || QUALITY_CONFIGS.crunch;
+      const targetCount = DENSITY_MAP[currentDensity] || cfg.baseCount;
+      particles = Array.from({ length: targetCount }, () => new SwarmParticle());
+    }
 
-    function animate() {
+    // Initialize
+    resize();
+    reseedParticles();
+
+    function animate(timestamp) {
+      const cfg = QUALITY_CONFIGS[currentQuality] || QUALITY_CONFIGS.crunch;
+
+      // Track FPS
+      frameTimes.push(timestamp);
+      if (frameTimes.length > 30) frameTimes.shift();
+      if (timestamp - lastFpsUpdate > 450) {
+        lastFpsUpdate = timestamp;
+        if (frameTimes.length > 5) {
+          const fps = Math.round(1000 / ((frameTimes[frameTimes.length - 1] - frameTimes[0]) / (frameTimes.length - 1)));
+          fpsCountEl.textContent = `${Math.min(fps, 144)} FPS`;
+        }
+      }
+
       // Fluid decay trail background
-      ctx.fillStyle = 'rgba(5, 6, 8, 0.28)';
+      ctx.fillStyle = cfg.decayFill;
       ctx.fillRect(0, 0, width, height);
 
       ctx.save();
@@ -454,7 +682,21 @@
 
       requestAnimationFrame(animate);
     }
-    animate();
+    requestAnimationFrame(animate);
+
+    // Controls listeners
+    qualitySelect.addEventListener('change', () => {
+      currentQuality = qualitySelect.value;
+      localStorage.setItem('particle_quality', currentQuality);
+      resize();
+      reseedParticles();
+    });
+
+    densitySelect.addEventListener('change', () => {
+      currentDensity = densitySelect.value;
+      localStorage.setItem('particle_density', currentDensity);
+      reseedParticles();
+    });
 
     modeSelect.addEventListener('change', () => {
       currentMode = modeSelect.value;
